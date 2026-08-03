@@ -195,13 +195,35 @@
     background:#fff;
   }
   .gallery .main-shot img{width:100%;height:100%;object-fit:contain;}
-  .thumbs{display:flex; gap:10px;}
-  .thumbs img{
-    width:64px;height:64px;object-fit:cover;border-radius:8px;
-    background:#fff; cursor:pointer; border:2px solid transparent;
-    opacity:.75; transition:.15s;
+  /* ===== 360 viewer ===== */
+  .viewer360{
+    position:relative; width:100%; aspect-ratio:1/1; border-radius:10px;
+    overflow:hidden; background:#fff; cursor:grab; touch-action:pan-y; user-select:none;
   }
-  .thumbs img:hover, .thumbs img.active{opacity:1; border-color:var(--amber);}
+  .viewer360.dragging{cursor:grabbing;}
+  .viewer360 img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
+    opacity:0; transition:opacity .05s linear; pointer-events:none;
+  }
+  .viewer360 img.active{opacity:1;}
+  .viewer360 .hint360{
+    position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+    background:rgba(14,15,17,.78); color:var(--text); font-size:.78rem; font-weight:700;
+    padding:7px 14px; border-radius:999px; display:flex; align-items:center; gap:6px;
+    pointer-events:none; transition:opacity .3s ease, transform .3s ease; z-index:6;
+    border:1px solid var(--line);
+  }
+  .viewer360 .hint360 .spin{display:inline-block; animation:spin360 1.6s linear infinite;}
+  @keyframes spin360{ to{ transform:rotate(360deg); } }
+  .viewer360.interacted .hint360{ opacity:0; transform:translateX(-50%) translateY(6px); }
+  .viewer360 .dots360{
+    position:absolute; top:10px; left:50%; transform:translateX(-50%);
+    display:flex; gap:5px; z-index:6;
+  }
+  .viewer360 .dots360 span{
+    width:6px; height:6px; border-radius:50%; background:rgba(0,0,0,.18); transition:.15s;
+  }
+  .viewer360 .dots360 span.active{ background:var(--amber); width:16px; border-radius:4px; }
 
   .details{ padding:36px 32px; display:flex; flex-direction:column; min-width:0;}
   .details .eyebrow{color:var(--amber); font-weight:700; font-size:.85rem; letter-spacing:1px;}
@@ -415,13 +437,26 @@
       <span class="badge-limited">كمية محدودة</span>
       <div class="product-grid">
         <div class="gallery">
-          <div class="main-shot"><img id="mainShot" src="hero.jpeg" alt="كاسك بلوتوث LS2"></div>
-          <div class="thumbs">
-            <img src="hero.jpeg" class="active" onclick="swap(this)">
-            <img src="angle1.jpeg" onclick="swap(this)">
-            <img src="angle2.jpeg" onclick="swap(this)">
-            <img src="angle3.jpeg" onclick="swap(this)">
-            <img src="angle4.jpeg" onclick="swap(this)">
+          <div class="viewer360" id="viewer360">
+            <div class="dots360" id="dots360"></div>
+            <img src="product/IMG_2119.webp" class="active" alt="كاسك - الجهة 1">
+            <img src="product/IMG_2120.webp" alt="كاسك - الجهة 2">
+            <img src="product/IMG_2121.webp" alt="كاسك - الجهة 3">
+            <img src="product/IMG_2122.webp" alt="كاسك - الجهة 4">
+            <img src="product/IMG_2123.webp" alt="كاسك - الجهة 5">
+            <img src="product/IMG_2124.webp" alt="كاسك - الجهة 6">
+            <img src="product/IMG_2125.webp" alt="كاسك - الجهة 7">
+            <img src="product/IMG_2126.webp" alt="كاسك - الجهة 8">
+            <img src="product/IMG_2127.webp" alt="كاسك - الجهة 9">
+            <img src="product/IMG_2128.webp" alt="كاسك - الجهة 10">
+            <img src="product/IMG_2129.webp" alt="كاسك - الجهة 11">
+            <img src="product/IMG_2130.webp" alt="كاسك - الجهة 12">
+            <img src="product/IMG_2131.webp" alt="كاسك - الجهة 13">
+            <img src="product/IMG_2132.webp" alt="كاسك - الجهة 14">
+            <img src="product/IMG_2133.webp" alt="كاسك - الجهة 15">
+            <img src="product/IMG_2134.webp" alt="كاسك - الجهة 16">
+            <img src="product/IMG_2135.webp" alt="كاسك - الجهة 17">
+            <div class="hint360"><span class="spin">🔄</span> اسحب يمين/يسار لتدوير الخوذة</div>
           </div>
         </div>
 
@@ -591,12 +626,67 @@
   }
   crash.addEventListener('click', finishIntro); // allow skip
 
-  // ---------- gallery swap ----------
-  function swap(el){
-    document.getElementById('mainShot').src = el.src;
-    document.querySelectorAll('.thumbs img').forEach(i=>i.classList.remove('active'));
-    el.classList.add('active');
-  }
+  // ---------- 360 viewer (drag to rotate) ----------
+  (function(){
+    const viewer = document.getElementById('viewer360');
+    const frames = Array.from(viewer.querySelectorAll('img'));
+    const dotsWrap = document.getElementById('dots360');
+    const total = frames.length;
+    let current = 0;
+    let dragging = false;
+    let startX = 0;
+    let lastX = 0;
+    let acc = 0;
+    const STEP = 40; // px of drag per frame step
+
+    frames.forEach((_, i)=>{
+      const d = document.createElement('span');
+      if(i === 0) d.classList.add('active');
+      dotsWrap.appendChild(d);
+    });
+    const dots = Array.from(dotsWrap.children);
+
+    function show(index){
+      current = ((index % total) + total) % total;
+      frames.forEach((f,i)=> f.classList.toggle('active', i === current));
+      dots.forEach((d,i)=> d.classList.toggle('active', i === current));
+    }
+
+    function markInteracted(){ viewer.classList.add('interacted'); }
+
+    function pointerDown(x){
+      dragging = true; startX = x; lastX = x; acc = 0;
+      viewer.classList.add('dragging');
+    }
+    function pointerMove(x){
+      if(!dragging) return;
+      const dx = x - lastX;
+      lastX = x;
+      acc += dx;
+      while(acc > STEP){ show(current - 1); acc -= STEP; markInteracted(); } // drag right -> rotate one way
+      while(acc < -STEP){ show(current + 1); acc += STEP; markInteracted(); } // drag left -> rotate other way
+    }
+    function pointerUp(){
+      dragging = false;
+      viewer.classList.remove('dragging');
+    }
+
+    // mouse
+    viewer.addEventListener('mousedown', e=>{ pointerDown(e.clientX); e.preventDefault(); });
+    window.addEventListener('mousemove', e=> pointerMove(e.clientX));
+    window.addEventListener('mouseup', pointerUp);
+
+    // touch
+    viewer.addEventListener('touchstart', e=>{ pointerDown(e.touches[0].clientX); }, {passive:true});
+    viewer.addEventListener('touchmove', e=>{ pointerMove(e.touches[0].clientX); }, {passive:true});
+    viewer.addEventListener('touchend', pointerUp);
+
+    // click dots to jump directly
+    dots.forEach((d,i)=> d.addEventListener('click', ()=>{ show(i); markInteracted(); }));
+
+    // click-drag hint fallback: clicking image nudges one frame forward
+    viewer.addEventListener('click', ()=>{ if(!dragging){} });
+  })();
 
   // ---------- header contact (talk to Adem directly) ----------
   function openContact(e){
