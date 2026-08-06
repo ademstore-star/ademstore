@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خوذة الحافة | مصممة لتلتهم الطريق</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=IBM+Plex+Sans+Arabic:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a0a0d;
+    --bg-1:#131318;
+    --steel:#2e3138;
+    --ink:#e8e9ec;
+    --ink-dim:#9a9ca3;
+    --accent:#ff5a1f;
+    --accent-dim:#a83e17;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{
+    background:var(--bg-0);
+    color:var(--ink);
+    font-family:'IBM Plex Sans Arabic','Tajawal',sans-serif;
+    overflow-x:hidden;
+    width:100%;
+  }
+  .stage{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    isolation:isolate;
+  }
+  /* speed-streak signature backdrop */
+  .streaks{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .streaks span{
+    position:absolute;
+    right:-10%;
+    height:1px;
+    width:120%;
+    background:linear-gradient(90deg, transparent, var(--steel) 40%, transparent 70%);
+    transform-origin:right center;
+    opacity:.5;
+  }
+  .streaks span.accent{ background:linear-gradient(90deg, transparent, var(--accent) 45%, transparent 75%); opacity:.35; height:2px;}
+
+  .grid{
+    position:relative;
+    z-index:2;
+    display:grid;
+    grid-template-columns:1.05fr 1fr;
+    align-items:center;
+    gap:2rem;
+    max-width:1280px;
+    margin:0 auto;
+    padding:6.5rem 2rem 4rem;
+    width:100%;
+  }
+  @media (max-width:880px){
+    .grid{grid-template-columns:1fr; padding-top:5.5rem;}
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:.6rem;
+    font-family:'Tajawal',sans-serif;
+    font-weight:700;
+    font-size:.78rem;
+    letter-spacing:.12em;
+    color:var(--accent);
+    margin-bottom:1.3rem;
+  }
+  .eyebrow::before{
+    content:'';
+    width:26px;height:2px;
+    background:var(--accent);
+    display:inline-block;
+  }
+
+  h1{
+    font-family:'Tajawal',sans-serif;
+    font-weight:900;
+    font-size:clamp(2.6rem, 5.2vw, 4.4rem);
+    line-height:1.05;
+    letter-spacing:-.01em;
+    margin-bottom:1.4rem;
+  }
+  h1 em{
+    font-style:normal;
+    color:var(--accent);
+  }
+
+  .lede{
+    font-size:1.08rem;
+    line-height:1.85;
+    color:var(--ink-dim);
+    max-width:44ch;
+    margin-bottom:2.2rem;
+  }
+
+  .features{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.7rem;
+    margin-bottom:2.6rem;
+  }
+  .chip{
+    border:1px solid #33353c;
+    background:#151519;
+    padding:.6rem 1rem;
+    border-radius:3px;
+    font-size:.86rem;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+  }
+  .chip.on{
+    border-color:var(--accent-dim);
+    background:linear-gradient(180deg,#1a1310,#151519);
+  }
+  .chip .dot{width:6px;height:6px;background:var(--steel);border-radius:50%;flex-shrink:0;}
+  .chip.on .dot{background:var(--accent);}
+
+  .cta-row{display:flex; align-items:center; gap:1.4rem; flex-wrap:wrap;}
+  .cta{
+    font-family:'Tajawal',sans-serif;
+    font-weight:700;
+    font-size:1rem;
+    background:var(--accent);
+    color:#0a0a0d;
+    border:none;
+    padding:.95rem 2.1rem;
+    border-radius:2px;
+    cursor:pointer;
+    letter-spacing:.02em;
+    transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 0 0 rgba(255,90,31,0);
+  }
+  .cta:hover{ transform:translateY(-2px); box-shadow:0 10px 30px -8px rgba(255,90,31,.55); }
+  .hint{font-size:.82rem; color:var(--ink-dim);}
+  .hint b{color:var(--ink); font-weight:600;}
+
+  .viewer-wrap{
+    position:relative;
+    height:min(72vh, 640px);
+    min-height:420px;
+  }
+  #canvas-holder{
+    width:100%;
+    height:100%;
+    cursor:grab;
+    border-radius:6px;
+  }
+  #canvas-holder:active{cursor:grabbing;}
+  #canvas-holder canvas{display:block; width:100%!important; height:100%!important;}
+
+  .drag-tag{
+    position:absolute;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
+    font-family:'Tajawal',sans-serif;
+    font-size:.74rem;
+    letter-spacing:.08em;
+    color:var(--ink-dim);
+    background:rgba(19,19,24,.7);
+    border:1px solid #2a2b31;
+    padding:.4rem .9rem;
+    border-radius:20px;
+    pointer-events:none;
+    backdrop-filter:blur(4px);
+  }
+
+  .loading{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Tajawal',sans-serif;
+    font-size:.85rem;
+    color:var(--ink-dim);
+    letter-spacing:.1em;
+  }
+
+  footer{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:1.6rem;
+    font-size:.78rem;
+    color:#5a5c63;
+    border-top:1px solid #17181c;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .streaks span{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="streaks" id="streaks"></div>
+
+  <div class="grid">
+    <div>
+      <div class="eyebrow">هيكل منحوت هوائياً</div>
+      <h1>خوذة <em>الحافّة</em><br>مصممة لتلتهم الطريق</h1>
+      <p class="lede">
+        كل انحناءة في القشرة الخارجية مدروسة لتقليل مقاومة الهواء وتوزيع خطوط السرعة على طول الهيكل،
+        فيبقى الشكل رياضياً حاداً من أي زاوية تنظر إليه.
+      </p>
+
+      <div class="features">
+        <div class="chip on"><span class="dot"></span> قشرة انسيابية مضغوطة</div>
+        <div class="chip"><span class="dot"></span> فتحات تهوية منحوتة</div>
+        <div class="chip"><span class="dot"></span> واجهة بانورامية</div>
+        <div class="chip"><span class="dot"></span> توازن وزن دقيق</div>
+      </div>
+
+      <div class="cta-row">
+        <button class="cta">اطلب الخوذة الآن</button>
+        <span class="hint">اسحب النموذج <b>بالماوس أو إصبعك</b> لتدويره</span>
+      </div>
+    </div>
+
+    <div class="viewer-wrap">
+      <div id="canvas-holder">
+        <div class="loading" id="loadingTag">جاري تجهيز النموذج…</div>
+      </div>
+      <div class="drag-tag">اسحب للتدوير · مرّر للتكبير</div>
+    </div>
+  </div>
+
+  <footer>معاينة تفاعلية للمنتج — نموذج تصميمي وليس صورة فوتوغرافية حقيقية</footer>
+</div>
+
+<script>
+  // signature speed-streak backdrop, diagonal lines of varying weight/opacity
+  const streaksHolder = document.getElementById('streaks');
+  const streakCount = 14;
+  for(let i=0;i<streakCount;i++){
+    const s = document.createElement('span');
+    const isAccent = i % 5 === 0;
+    if(isAccent) s.classList.add('accent');
+    const top = (i / streakCount) * 100 + (Math.random()*4-2);
+    s.style.top = top + '%';
+    s.style.transform = `rotate(${-7 - Math.random()*3}deg)`;
+    s.style.opacity = (0.15 + Math.random()*0.25).toFixed(2);
+    streaksHolder.appendChild(s);
+  }
+</script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/[email protected]/build/three.module.js",
+    "three/addons/": "https://unpkg.com/[email protected]/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const holder = document.getElementById('canvas-holder');
+
+const scene = new THREE.Scene();
+scene.background = null;
+
+const camera = new THREE.PerspectiveCamera(38, holder.clientWidth / holder.clientHeight, 0.1, 100);
+camera.position.set(0.15, 0.35, 3.1);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(holder.clientWidth, holder.clientHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+holder.appendChild(renderer.domElement);
+document.getElementById('loadingTag').remove();
+
+// ---- Lighting rig (fakes a studio HDRI for glossy paint) ----
+scene.add(new THREE.AmbientLight(0x404048, 0.6));
+
+const keyLight = new THREE.DirectionalLight(0xfff2e6, 2.4);
+keyLight.position.set(3, 4, 3);
+scene.add(keyLight);
+
+const rimLight = new THREE.PointLight(0xff5a1f, 6, 12, 2);
+rimLight.position.set(-2.5, 1.2, -2);
+scene.add(rimLight);
+
+const fillLight = new THREE.PointLight(0x6f8bff, 2.2, 12, 2);
+fillLight.position.set(-1.5, -1, 2.5);
+scene.add(fillLight);
+
+const topLight = new THREE.PointLight(0xffffff, 1.4, 10, 2);
+topLight.position.set(0, 3, 0.5);
+scene.add(topLight);
+
+// ---- Helmet group ----
+const helmet = new THREE.Group();
+scene.add(helmet);
+
+const glossyBlack = new THREE.MeshPhysicalMaterial({
+  color: 0x0c0c0f,
+  metalness: 0.15,
+  roughness: 0.18,
+  clearcoat: 1,
+  clearcoatRoughness: 0.08,
+  reflectivity: 0.6,
+});
+
+const satinDark = new THREE.MeshPhysicalMaterial({
+  color: 0x151517,
+  metalness: 0.3,
+  roughness: 0.5,
+  clearcoat: 0.3,
+});
+
+const visorGlass = new THREE.MeshPhysicalMaterial({
+  color: 0x0a0d12,
+  metalness: 0.1,
+  roughness: 0.05,
+  transmission: 0.55,
+  thickness: 0.3,
+  transparent: true,
+  opacity: 0.92,
+  clearcoat: 1,
+});
+
+const accentMat = new THREE.MeshPhysicalMaterial({
+  color: 0xff5a1f,
+  metalness: 0.4,
+  roughness: 0.3,
+  clearcoat: 0.6,
+});
+
+const silverMat = new THREE.MeshStandardMaterial({
+  color: 0xb9bcc3,
+  metalness: 0.9,
+  roughness: 0.3,
+});
+
+// main dome shell — sphere with open base, slightly egg-shaped for aero look
+const shellGeo = new THREE.SphereGeometry(1, 64, 64, 0, Math.PI * 2, 0, Math.PI * 0.68);
+shellGeo.scale(1, 1.02, 1.12);
+const shell = new THREE.Mesh(shellGeo, glossyBlack);
+shell.position.y = 0.02;
+helmet.add(shell);
+
+// lower rim / base ring (satin, where it meets the neck)
+const rimGeo = new THREE.TorusGeometry(0.895, 0.05, 24, 64);
+rimGeo.scale(1, 0.6, 1.12);
+const rim = new THREE.Mesh(rimGeo, satinDark);
+rim.rotation.x = Math.PI / 2;
+rim.position.y = -0.36;
+helmet.add(rim);
+
+// chin bar (front-lower jaw guard)
+const chinGeo = new THREE.SphereGeometry(0.72, 48, 48, -Math.PI * 0.42, Math.PI * 0.84, Math.PI * 0.28, Math.PI * 0.5);
+const chin = new THREE.Mesh(chinGeo, glossyBlack);
+chin.position.set(0, -0.28, 0.42);
+chin.rotation.x = 0.15;
+helmet.add(chin);
+
+// visor — curved lens across the face opening
+const visorGeo = new THREE.SphereGeometry(0.82, 48, 48, -Math.PI * 0.36, Math.PI * 0.72, Math.PI * 0.32, Math.PI * 0.34);
+const visor = new THREE.Mesh(visorGeo, visorGlass);
+visor.position.set(0, 0.02, 0.46);
+helmet.add(visor);
+
+// visor trim ring
+const visorTrimGeo = new THREE.TorusGeometry(0.815, 0.018, 12, 64, Math.PI * 0.9);
+const visorTrim = new THREE.Mesh(visorTrimGeo, silverMat);
+visorTrim.position.set(0, 0.02, 0.47);
+visorTrim.rotation.set(Math.PI / 2, 0, -Math.PI * 0.45);
+helmet.add(visorTrim);
+
+// racing stripe — thin arc hugging the dome, off-center for dynamism
+const stripeGeo = new THREE.TorusGeometry(1.005, 0.045, 12, 64, Math.PI * 0.62);
+const stripe = new THREE.Mesh(stripeGeo, accentMat);
+stripe.scale.set(1, 1.02, 1.12);
+stripe.rotation.set(0.35, 0.5, 1.02);
+stripe.position.set(0.1, 0.1, -0.05);
+helmet.add(stripe);
+
+// vents on top — small aerodynamic fins
+for (let i = 0; i < 3; i++) {
+  const ventGeo = new THREE.BoxGeometry(0.16, 0.05, 0.32);
+  const vent = new THREE.Mesh(ventGeo, satinDark);
+  vent.position.set(-0.22 + i * 0.22, 0.78, -0.1);
+  vent.rotation.x = -0.25;
+  helmet.add(vent);
+}
+
+// small side intake
+const intakeGeo = new THREE.CylinderGeometry(0.09, 0.11, 0.06, 20);
+const intakeL = new THREE.Mesh(intakeGeo, satinDark);
+intakeL.rotation.z = Math.PI / 2;
+intakeL.position.set(-0.83, -0.05, 0.15);
+helmet.add(intakeL);
+const intakeR = intakeL.clone();
+intakeR.position.x = 0.83;
+helmet.add(intakeR);
+
+helmet.rotation.y = -0.5;
+helmet.position.y = -0.05;
+
+// ---- Controls ----
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.enablePan = false;
+controls.minDistance = 1.9;
+controls.maxDistance = 5;
+controls.minPolarAngle = Math.PI * 0.18;
+controls.maxPolarAngle = Math.PI * 0.72;
+controls.autoRotate = true;
+controls.autoRotateSpeed = 1.1;
+controls.target.set(0, -0.05, 0);
+
+renderer.domElement.addEventListener('pointerdown', () => { controls.autoRotate = false; });
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+function onResize() {
+  const w = holder.clientWidth, h = holder.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+}
+window.addEventListener('resize', onResize);
+</script>
+
+</body>
+</html>
