@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADEM STORE | قطع غيار وخوذ الدراجات النارية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+<style>
+  :root{
+    --bg:#0e0f11;
+    --panel:#17191c;
+    --panel-2:#1e2124;
+    --line:rgba(255,255,255,.08);
+    --steel:#8a9099;
+    --text:#eeeeec;
+    --muted:#9aa0a8;
+    --amber:#f2a93b;
+    --amber-2:#c98420;
+    --red:#d62839;
+    --lime:#8CFF1A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Cairo',sans-serif;
+    overflow-x:hidden;
+    min-height:100vh;
+    word-wrap:break-word;
+    overflow-wrap:break-word;
+    position:relative;
+  }
+  body.locked{overflow:hidden;height:100vh;}
+  h1,h2,h3,.display{font-family:'Lalezar',sans-serif; font-weight:400; letter-spacing:.5px;}
+
+  /* ===== dynamic ambient glow background ===== */
+  .ambient-glow {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .glow-orb {
+    position: absolute;
+    width: 45vw; height: 45vw;
+    background: radial-gradient(circle, rgba(242,169,59,0.07) 0%, rgba(140,255,26,0.03) 40%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(60px);
+    transition: transform 0.5s ease-out;
+    animation: orbFloat 14s ease-in-out infinite alternate;
+  }
+  .glow-orb.orb-1 { top: -10%; left: -10%; animation-duration: 16s; }
+  .glow-orb.orb-2 { bottom: -10%; right: -10%; background: radial-gradient(circle, rgba(140,255,26,0.05) 0%, rgba(242,169,59,0.04) 50%, transparent 70%); animation-duration: 20s; }
+  @keyframes orbFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(60px, 40px) scale(1.15); }
+  }
+
+  /* ensure content sits above ambient glow */
+  header, .hero, section, footer, #overlay, #crash { position: relative; z-index: 2; }
+
+  /* ===== hazard stripe utility ===== */
+  .hazard{
+    background-image:repeating-linear-gradient(135deg,var(--amber) 0 18px, #111 18px 36px);
+    height:6px;
+  }
+  .hazard.thin{height:3px;}
+
+  /* ===== live social proof ticker ===== */
+  .ticker-wrap {
+    background: rgba(242, 169, 59, 0.08);
+    border-bottom: 1px solid rgba(242, 169, 59, 0.2);
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    padding: 6px 0;
+    font-size: 0.82rem;
+    color: var(--amber);
+    font-weight: 700;
+  }
+  .ticker-content {
+    display: inline-block;
+    animation: tickerMove 30s linear infinite;
+    padding-left: 100%;
+  }
+  .ticker-content span {
+    margin-left: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  @keyframes tickerMove {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+  }
+
+  /* ===== sound toggle button in header ===== */
+  .sound-btn {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--muted);
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: .15s;
+    font-size: 1rem;
+  }
+  .sound-btn:hover { border-color: var(--amber); color: var(--amber); }
+  .sound-btn.active { color: var(--lime); border-color: rgba(140,255,26,0.4); background: rgba(140,255,26,0.06); }
+
+  /* ===== companion bike that follows cursor / finger ===== */
+  #companionBike{
+    position:fixed; top:0; left:0;
+    width:76px; height:auto;
+    pointer-events:none; z-index:650;
+    opacity:0; transition:opacity .4s ease;
+    filter:drop-shadow(0 8px 10px rgba(0,0,0,.4)) drop-shadow(0 0 10px rgba(140,255,26,.15));
+    will-change:transform;
+  }
+  #companionBike.show{ opacity:1; }
+  #companionBike .wheel-rear, #companionBike .wheel-front{
+    transform-origin:center; animation:wheelSpin 0.55s linear infinite;
+  }
+  @keyframes wheelSpin{ to{ transform:rotate(360deg); } }
+  @media (max-width:640px){ #companionBike{ width:56px; } }
+  @media (prefers-reduced-motion: reduce){ #companionBike{ display:none; } }
+
+  /* ===== crash intro overlay ===== */
+  #crash{
+    position:fixed; inset:0; z-index:9999;
+    background:radial-gradient(ellipse at center, #16181b 0%, #000 78%);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  #crash.hide{ display:none; }
+  .vignette{
+    position:absolute; inset:0; pointer-events:none;
+    box-shadow:inset 0 0 18vw 4vw #000;
+  }
+  .ray{
+    position:absolute; top:50%; left:50%; width:1px; height:160vmax;
+    background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.06), rgba(255,255,255,0));
+    opacity:0;
+  }
+  .ray.go{ animation: rayGrow 1s ease-out forwards; }
+  @keyframes rayGrow{
+    0%{opacity:0;} 15%{opacity:1;} 100%{opacity:0;}
+  }
+  #bike{
+    position:absolute; top:52%; left:50%;
+    width:220px;
+    transform:translate(-50%,-50%) scale(.05);
+    opacity:0;
+    filter:drop-shadow(0 0 24px rgba(140,255,26,.25));
+  }
+  #bike.ride{ animation: approach 1.15s cubic-bezier(.4,0,.7,.15) forwards; }
+  @keyframes approach{
+    0%{ transform:translate(-50%,-50%) scale(.05); opacity:0; }
+    10%{ opacity:1; }
+    70%{ transform:translate(-50%,-50%) scale(1.3); opacity:1; }
+    100%{ transform:translate(-52%,-48%) scale(3.4); opacity:0; }
+  }
+  #flash{
+    position:absolute; inset:0;
+    background:radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(242,169,59,.85) 35%, rgba(0,0,0,0) 72%);
+    opacity:0; pointer-events:none;
+  }
+  #flash.pop{ animation: flashPop .5s ease-out forwards; }
+  @keyframes flashPop{ 0%{opacity:0;} 10%{opacity:1;} 100%{opacity:0;} }
+  #shakeWrap.shaking{ animation: shake .45s ease-in-out; }
+  @keyframes shake{
+    0%,100%{transform:translate(0,0);}
+    15%{transform:translate(-14px,5px);}
+    35%{transform:translate(11px,-8px);}
+    55%{transform:translate(-8px,8px);}
+    75%{transform:translate(8px,-4px);}
+    90%{transform:translate(-3px,2px);}
+  }
+  #crashWord{
+    position:absolute; opacity:0; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  #crashWord .main-word{
+    font-family:'Lalezar',sans-serif; letter-spacing:1px;
+    font-size:clamp(2.8rem,8vw,5.2rem);
+    background:linear-gradient(180deg,#ffe3ac 0%, var(--amber) 55%, var(--amber-2) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 40px rgba(242,169,59,.35);
+  }
+  #crashWord .sub-word{
+    font-family:'Cairo',sans-serif; font-weight:700; letter-spacing:6px;
+    font-size:.85rem; color:#c7c9cc; text-transform:uppercase;
+    opacity:0;
+  }
+  #crashWord.show{ animation: wordPop 1s ease-out forwards; }
+  #crashWord.show .sub-word{ animation: subFade .8s ease-out .5s forwards; }
+  @keyframes wordPop{
+    0%{opacity:0; transform:scale(.75) translateY(6px); filter:blur(6px);}
+    45%{opacity:1; transform:scale(1.05) translateY(0); filter:blur(0);}
+    70%{transform:scale(1);}
+    100%{opacity:1; transform:scale(1);}
+  }
+  @keyframes subFade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ===== main content fade ===== */
+  #main{ opacity:0; }
+  #main.reveal{ animation: fadeUp .8s ease forwards; }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ===== header ===== */
+  header{
+    position:sticky; top:0; z-index:500;
+    background:rgba(14,15,17,.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    max-width:1100px; margin:0 auto; padding:12px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{ font-family:'Lalezar',sans-serif; font-size:1.5rem; letter-spacing:1px; color:var(--text);}
+  .logo b{color:var(--amber);}
+  .nav-actions{ display:flex; align-items:center; gap:12px; }
+  .nav a.cta{
+    background:var(--amber); color:#141414; font-weight:800;
+    padding:9px 20px; border-radius:6px; text-decoration:none;
+    font-size:.92rem; display:inline-flex; align-items:center; gap:6px;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .nav a.cta:hover{ transform: translateY(-2px); background: #ffbf5c; }
+
+  /* ===== hero ===== */
+  .hero{
+    max-width:1100px; margin:0 auto; padding:60px 20px 40px;
+    text-align:center;
+  }
+  .hero h1{
+    font-size:clamp(2.6rem,8vw,5rem); color:var(--text);
+  }
+  .hero h1 span{color:var(--amber);}
+  .hero p{
+    color:var(--muted); max-width:560px; margin:18px auto 0;
+    font-size:1.05rem; line-height:1.9;
+  }
+  .scrollcue{
+    margin-top:38px; color:var(--steel); font-size:.85rem;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  .scrollcue .arrow{
+    width:10px;height:10px;border-left:2px solid var(--amber);border-bottom:2px solid var(--amber);
+    transform:rotate(-45deg); animation:bounce 1.6s infinite;
+  }
+  @keyframes bounce{0%,100%{transform:translateY(0) rotate(-45deg);}50%{transform:translateY(6px) rotate(-45deg);}}
+
+  section{max-width:1100px; margin:0 auto; padding:70px 20px;}
+  .section-title{ text-align:center; margin-bottom:36px;}
+  .section-title h2{ font-size:clamp(1.8rem,5vw,2.6rem);}
+  .section-title p{color:var(--muted); margin-top:8px;}
+
+  /* ===== product 3D tilt container ===== */
+  .product-tilt-wrapper {
+    transform-style: preserve-style;
+    transform: perspective(1000px);
+  }
+  .product{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    position:relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    transition: border-color .3s ease, box-shadow .3s ease;
+  }
+  .product:hover {
+    border-color: rgba(242,169,59,0.35);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 30px rgba(242,169,59,0.1);
+  }
+  .product .badge-limited{
+    position:absolute; top:18px; left:18px; z-index:5;
+    background:var(--red); color:#fff; font-weight:800;
+    font-size:.78rem; padding:6px 14px; border-radius:999px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .badge-limited::before{content:"●"; color:#ffcbcb; animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .product-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:0; min-width:0;
+  }
+  @media(max-width:760px){ .product-grid{grid-template-columns:1fr;} }
+  .gallery{ background:#0a0b0c; padding:28px; display:flex; flex-direction:column; gap:14px; min-width:0;}
+  .gallery .main-shot{
+    width:100%; aspect-ratio:1/1; border-radius:10px; overflow:hidden;
+    background:#fff; position:relative;
+  }
+  .gallery .main-shot img{width:100%;height:100%;object-fit:contain; transition: transform .4s ease;}
+  .gallery .main-shot:hover img{ transform: scale(1.06); }
+  .thumbs{display:flex; gap:10px;}
+  .thumbs img{
+    width:64px;height:64px;object-fit:cover;border-radius:8px;
+    background:#fff; cursor:pointer; border:2px solid transparent;
+    opacity:.75; transition:.15s;
+  }
+  .thumbs img:hover, .thumbs img.active{opacity:1; border-color:var(--amber);}
+
+  .details{ padding:36px 32px; display:flex; flex-direction:column; min-width:0;}
+  .details .eyebrow{color:var(--amber); font-weight:700; font-size:.85rem; letter-spacing:1px;}
+  .details h3{font-size:clamp(1.6rem,4vw,2.1rem); margin-top:6px;}
+  .specs{list-style:none; margin:0; display:flex; flex-direction:column; gap:12px;}
+  .specs li{
+    display:flex; align-items:flex-start; gap:10px; color:#d8dade; font-size:.97rem; line-height:1.6;
+  }
+  .specs li .ic{
+    flex:none; width:22px;height:22px; margin-top:2px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--amber);
+  }
+  .specs li .txt{ flex:1; min-width:0; overflow-wrap:break-word; word-break:break-word;}
+
+  .specs-toggle{
+    width:100%; margin-top:20px; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--text); font-family:'Cairo'; font-weight:700; font-size:.95rem;
+    padding:13px 16px; border-radius:8px; cursor:pointer;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    transition:.15s;
+  }
+  .specs-toggle:hover{border-color:var(--amber);}
+  .specs-toggle .arrow-ic{ transition:transform .25s ease; flex:none; color:var(--amber);}
+  .specs-toggle.open .arrow-ic{ transform:rotate(180deg); }
+  .specs-wrap{
+    max-height:0; overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .specs-wrap.open{ max-height:400px; }
+  .specs-wrap .specs{ padding-top:18px; }
+  .price-row{
+    display:flex; align-items:center; gap:16px; margin:10px 0 8px; flex-wrap:wrap;
+  }
+  .price-tag{
+    background:var(--amber); color:#141414; font-weight:900;
+    font-size:1.7rem; padding:8px 20px; border-radius:8px;
+    position:relative;
+    font-family:'Lalezar',sans-serif;
+  }
+  .price-tag small{font-size:.9rem; font-weight:700; margin-right:4px;}
+  .delivery-note{
+    display:flex; align-items:center; gap:8px; color:var(--steel);
+    font-size:.88rem; margin:14px 0 22px;
+    border-top:1px dashed var(--line); padding-top:14px;
+  }
+  .order-btn{
+    background:var(--amber); color:#141414; border:none; cursor:pointer;
+    font-family:'Cairo'; font-weight:800; font-size:1.05rem;
+    padding:15px 20px; border-radius:8px;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    position: relative; overflow: hidden;
+  }
+  .order-btn:hover{background:#ffbf5c; transform:translateY(-2px); box-shadow: 0 6px 20px rgba(242,169,59,0.3);}
+
+  /* ===== color + quantity selectors ===== */
+  .choice-row{display:flex; align-items:center; gap:22px; flex-wrap:nowrap; margin-bottom:18px; overflow-x:auto;}
+  .choice-block{margin-bottom:0; display:flex; align-items:center; gap:9px; flex:none;}
+  .choice-label{font-size:.85rem; color:var(--steel); font-weight:700; white-space:nowrap;}
+  .color-row{display:flex; gap:10px;}
+  .color-opt{
+    display:flex; align-items:center; gap:6px; border:1px solid var(--line);
+    background:#101214; padding:6px 11px; border-radius:7px; cursor:pointer;
+    font-size:.82rem; color:var(--muted); transition:.15s;
+  }
+  .color-opt .swatch{
+    width:12px;height:12px;border-radius:50%; border:1px solid rgba(255,255,255,.25);
+  }
+  .color-opt.glossy .swatch{background:#0c0d0e; box-shadow:inset 0 0 0 2px rgba(255,255,255,.15), 0 0 6px rgba(255,255,255,.15);}
+  .color-opt.mat .swatch{background:#26282b;}
+  .color-opt.active{border-color:var(--amber); color:var(--text); background:rgba(242,169,59,.08);}
+  .color-opt.active::after{content:"✓"; color:var(--amber); font-weight:900; margin-right:2px; font-size:.78rem;}
+  .qty-row{display:flex; align-items:center; gap:12px;}
+  .qty-stepper{
+    display:flex; align-items:center; border:1px solid var(--line); border-radius:7px; overflow:hidden;
+  }
+  .qty-stepper button{
+    background:#101214; color:var(--text); border:none; width:29px; height:29px;
+    font-size:.95rem; cursor:pointer; font-family:'Cairo'; font-weight:800;
+    transition: background .15s, color .15s;
+  }
+  .qty-stepper button:hover{background:#191b1e; color:var(--amber);}
+  .qty-stepper span{width:32px; text-align:center; font-weight:800; font-size:.88rem;}
+
+  .price-tag.discounted{background:var(--lime); color: #141414;}
+  .price-old{
+    color:var(--muted); text-decoration:line-through; font-size:1rem; font-weight:700;
+  }
+
+  /* ===== rabbit & car mini-game ===== */
+  .game-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:22px; margin-top:26px; display:flex; gap:20px; align-items:center; flex-wrap:wrap;
+    transition: border-color .3s;
+  }
+  @media(max-width:640px){ .game-card{flex-direction:column; text-align:center;} }
+  .game-scene{
+    position:relative; width:220px; height:130px; flex:none; background:#0a0b0c;
+    border-radius:10px; overflow:visible;
+  }
+  .game-text{flex:1; min-width:200px;}
+  .game-text h4{font-family:'Lalezar'; font-size:1.25rem; color:var(--amber); letter-spacing:.5px;}
+  .bubble{
+    position:absolute; top:2px; left:6px; background:#fff; color:#141414; font-size:.72rem;
+    font-weight:800; padding:5px 9px; border-radius:10px 10px 10px 2px; white-space:nowrap;
+    transition:.25s; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  #wheelBtn{cursor:pointer; transform-origin:center;}
+  #wheelBtn:hover circle{stroke:var(--amber);}
+  @keyframes wheelIn{
+    0%{ transform:translate(66px,72px) rotate(-20deg); }
+    100%{ transform:translate(168px,100px) rotate(0deg); }
+  }
+  .wheel-anim{ animation: wheelIn .6s cubic-bezier(.34,1.4,.5,1) forwards; }
+
+  /* ===== coming soon ===== */
+  .soon-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  @media(max-width:700px){ .soon-grid{grid-template-columns:1fr;} }
+  .soon-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    overflow:hidden; display:flex; flex-direction:column;
+    transition: transform .25s ease, border-color .25s ease;
+  }
+  .soon-card:hover{ transform: translateY(-4px); border-color: rgba(242,169,59,0.3); }
+  .soon-card .soon-image{
+    aspect-ratio:1/1; background:repeating-linear-gradient(135deg,#1c1e21 0 14px,#141517 14px 28px);
+    display:flex; align-items:center; justify-content:center; position:relative;
+  }
+  .soon-card .soon-image .ic{font-size:2.4rem; opacity:.55;}
+  .soon-card .soon-image .cap{
+    position:absolute; bottom:12px; right:0; left:0; text-align:center;
+    color:var(--amber); font-family:'Lalezar',sans-serif; font-size:1.2rem; letter-spacing:1px;
+  }
+  .soon-card .soon-body{padding:18px 16px; text-align:center;}
+  .soon-card h4{color:var(--text); font-weight:700; font-size:1.05rem; font-family:'Lalezar',sans-serif;}
+  .soon-card .soon-desc{color:var(--muted); font-size:.85rem; margin-top:4px;}
+  .soon-tag{
+    display:inline-block; margin-top:12px; background:rgba(242,169,59,.12);
+    color:var(--amber); font-size:.78rem; font-weight:800;
+    padding:4px 12px; border-radius:999px; border:1px solid rgba(242,169,59,.3);
+  }
+
+  /* ===== order modal ===== */
+  #overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.75);
+    display:none; align-items:center; justify-content:center;
+    z-index:800; padding:20px; backdrop-filter:blur(5px);
+  }
+  #overlay.open{display:flex;}
+  .modal{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:14px;
+    max-width:460px; width:100%; padding:28px; max-height:88vh; overflow-y:auto;
+    position:relative; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+  }
+  .modal .close{
+    position:absolute; top:14px; left:14px; background:none; border:none;
+    color:var(--steel); font-size:1.4rem; cursor:pointer; line-height:1;
+    transition: color .15s;
+  }
+  .modal .close:hover{ color: var(--text); }
+  .modal h3{font-size:1.4rem; margin-bottom:4px;}
+  .modal .sub{color:var(--muted); font-size:.86rem; margin-bottom:20px;}
+  .field{margin-bottom:14px; display:flex; flex-direction:column; gap:6px;}
+  .field label{font-size:.85rem; color:var(--steel); font-weight:700;}
+  .field input, .field select{
+    background:#101214; border:1px solid var(--line); color:var(--text);
+    padding:11px 12px; border-radius:8px; font-family:'Cairo'; font-size:.95rem;
+    transition: border-color .15s, outline .15s;
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--amber); border-color:var(--amber);}
+  .toggle-row{display:flex; gap:10px;}
+  .toggle-row label{
+    flex:1; text-align:center; border:1px solid var(--line); border-radius:8px;
+    padding:11px 6px; font-size:.87rem; cursor:pointer; color:var(--muted);
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .toggle-row input{display:none;}
+  .toggle-row input:checked + span{color:#141414;}
+  .toggle-row label:has(input:checked){background:var(--amber); border-color:var(--amber); color:#141414; font-weight:800;}
+  .submit-btn{
+    width:100%; margin-top:8px; background:var(--amber); border:none; color:#141414;
+    font-weight:900; font-family:'Cairo'; font-size:1rem; padding:14px; border-radius:8px; cursor:pointer;
+    transition: background .15s, transform .15s;
+  }
+  .submit-btn:hover{background:#ffbf5c; transform: translateY(-1px);}
+
+  /* ===== footer ===== */
+  footer{
+    border-top:1px solid var(--line); padding:50px 20px 34px; text-align:center;
+    margin-top:20px;
+  }
+  .farewell{ color:var(--text); font-size:1.05rem; margin-bottom:22px; font-family:'Lalezar'; letter-spacing:.5px;}
+  .social{display:flex; justify-content:center; gap:16px; margin-bottom:22px;}
+  .social a{
+    width:46px; height:46px; border-radius:50%; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; color:var(--text);
+    transition:.15s;
+  }
+  .social a:hover{background:var(--amber); color:#141414; border-color:var(--amber); transform:translateY(-3px);}
+  footer .fine{color:var(--muted); font-size:.8rem;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body class="locked">
+
+<!-- ===== dynamic ambient background glow ===== -->
+<div class="ambient-glow">
+  <div class="glow-orb orb-1" id="orb1"></div>
+  <div class="glow-orb orb-2" id="orb2"></div>
+</div>
+
+<!-- ===== companion bike (follows cursor / finger, wanders when idle) ===== -->
+<svg id="companionBike" viewBox="0 0 120 60" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="60" cy="55" rx="46" ry="4" fill="#000" opacity=".25"/>
+
+  <!-- exhaust -->
+  <rect x="6" y="38" width="18" height="5" rx="2.5" fill="#2b2d30"/>
+
+  <!-- swingarm + front fork -->
+  <line x1="22" y1="42" x2="44" y2="28" stroke="#141414" stroke-width="7" stroke-linecap="round"/>
+  <line x1="66" y1="30" x2="96" y2="42" stroke="#141414" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- engine block -->
+  <rect x="40" y="28" width="26" height="15" rx="4" fill="#141414"/>
+
+  <!-- seat + tank silhouette -->
+  <path d="M44 28 Q50 13 66 12 Q75 12 77 19 Q77 26 66 28 Z" fill="#141414"/>
+  <!-- tank accent stripe -->
+  <path d="M50 20 Q58 14 68 16 Q66 21 55 23 Z" fill="#8CFF1A"/>
+
+  <!-- handlebar -->
+  <line x1="68" y1="15" x2="78" y2="6" stroke="#141414" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="78" cy="6" r="3" fill="#141414"/>
+
+  <!-- headlight stub -->
+  <line x1="76" y1="20" x2="88" y2="22" stroke="#141414" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="88" cy="22" r="3.5" fill="#eaffef"/>
+
+  <!-- rear wheel -->
+  <g class="wheel-rear">
+    <circle cx="22" cy="42" r="13" fill="#0c0d0e"/>
+    <circle cx="22" cy="42" r="7" fill="#2c2e31"/>
+    <circle cx="22" cy="42" r="2.5" fill="#666"/>
+  </g>
+  <!-- front wheel -->
+  <g class="wheel-front">
+    <circle cx="96" cy="42" r="13" fill="#0c0d0e"/>
+    <circle cx="96" cy="42" r="7" fill="#2c2e31"/>
+    <circle cx="96" cy="42" r="2.5" fill="#666"/>
+  </g>
+</svg>
+
+<!-- ============ CRASH INTRO ============ -->
+<div id="crash">
+  <div class="vignette"></div>
+  <div id="shakeWrap" style="position:absolute;inset:0;">
+    <div class="ray" style="transform:rotate(-40deg);"></div>
+    <div class="ray" style="transform:rotate(-18deg);"></div>
+    <div class="ray" style="transform:rotate(0deg);"></div>
+    <div class="ray" style="transform:rotate(18deg);"></div>
+    <div class="ray" style="transform:rotate(40deg);"></div>
+
+    <!-- realistic front-view sportbike with rider -->
+    <svg id="bike" viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="80" cy="186" rx="52" ry="9" fill="#000" opacity=".38"/>
+      <ellipse cx="80" cy="168" rx="32" ry="15" fill="#0c0d0e"/>
+      <ellipse cx="80" cy="168" rx="13" ry="6" fill="#3a3d42"/>
+      <ellipse cx="80" cy="168" rx="4" ry="2" fill="#111"/>
+      <path d="M46 168 C46 140 56 116 80 116 C104 116 114 140 114 168 L104 176 C96 182 64 182 56 176 Z" fill="#141414"/>
+      <path d="M54 160 C54 136 64 122 80 122 C96 122 106 136 106 160 L100 170 C92 176 68 176 60 170 Z" fill="#8CFF1A"/>
+      <path d="M66 128 C71 123 89 123 94 128 L92 150 C86 156 74 156 68 150 Z" fill="#141414"/>
+      <path d="M70 108 L90 108 L94 122 L66 122 Z" fill="#cfeeff" opacity=".55"/>
+      <rect x="71" y="134" width="18" height="10" rx="3" fill="#eaffef"/>
+      <circle cx="61" cy="142" r="5" fill="#dff7ff"/>
+      <circle cx="99" cy="142" r="5" fill="#dff7ff"/>
+      <path d="M40 130 L28 122 L28 136 Z" fill="#141414"/>
+      <path d="M120 130 L132 122 L132 136 Z" fill="#141414"/>
+      <path d="M56 118 C58 100 64 88 80 88 C96 88 102 100 104 118 C96 112 64 112 56 118 Z" fill="#101214"/>
+      <path d="M60 116 C68 122 92 122 100 116 L98 128 C90 134 70 134 62 128 Z" fill="#8CFF1A" opacity=".9"/>
+      <path d="M56 118 L34 132 L38 140 L58 126 Z" fill="#101214"/>
+      <path d="M104 118 L126 132 L122 140 L102 126 Z" fill="#101214"/>
+      <ellipse cx="80" cy="66" rx="18" ry="20" fill="#101214"/>
+      <path d="M65 66 C65 56 71 48 80 48 C89 48 95 56 95 66 L92 74 C86 79 74 79 68 74 Z" fill="#1b1e21"/>
+      <path d="M69 66 C69 60 73 66 80 66 C87 66 91 60 91 66 L89 72 C84 76 76 76 71 72 Z" fill="#4b6b78" opacity=".85"/>
+      <path d="M72 50 C76 47 84 47 88 50" stroke="#8CFF1A" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <text x="80" y="163" text-anchor="middle" font-family="Cairo, sans-serif" font-size="8" font-weight="800" fill="#0c0d0e">H2R</text>
+    </svg>
+
+    <div id="flash"></div>
+    <div id="crashWord">
+      <span class="main-word">يا مرحباً 👋</span>
+      <span class="sub-word">ADEM STORE</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN SITE ============ -->
+<div id="main">
+
+  <!-- Live Social Proof Ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker-content" id="tickerContent">
+      <span>🔥 تم طلب كاسك LS2 في ولاية الجزائر منذ قليل</span>
+      <span>⚡ توصيل سريع لـ 58 ولاية بأسعار لوزية</span>
+      <span>🚀 الدفع عند الاستلام وضمان الجودة في ADEM STORE</span>
+      <span>🔥 طلب جديد في ولاية وهران - باقٍ القليل من الدفعة الحالية!</span>
+    </div>
+  </div>
+
+  <header>
+    <div class="nav">
+      <div class="logo">ADEM <b>STORE</b></div>
+      <div class="nav-actions">
+        <button class="sound-btn active" id="soundBtn" onclick="toggleSound()" title="تشغيل / إيقاف المؤثرات الصوتية">🔊</button>
+        <a class="cta" href="#" onclick="openContact(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px; margin-left:4px;"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.1 8.1 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1s-.7.8-.9 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4.1-.1.1-.3 0-.4s-.6-1.4-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.6 1.1 2.8.1.2 1.9 2.9 4.6 4a15.9 15.9 0 0 0 1.6.6c.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+          تواصل معنا
+        </a>
+      </div>
+    </div>
+    <div class="hazard thin"></div>
+  </header>
+
+  <div class="hero">
+    <h1>جاهز <span>للطريق؟</span> 🏍️</h1>
+    <p>ADEM STORE — متجرك الأول لبيع قطع غيار وخوذ الدراجات النارية بأسعار لوزية وجودة تقدر تعتمد عليها، مع توصيل يوصلك في كل ولايات الوطن.</p>
+    <div class="scrollcue"><span>مرر للأسفل</span><span class="arrow"></span></div>
+  </div>
+
+  <!-- ============ PRODUCT ============ -->
+  <section id="product">
+    <div class="section-title">
+      <h2>المنتوجات المتوفرة</h2>
+      <p>سعر لوزي لوزي وتوصيل يوم يومين يوصلك طلبك</p>
+    </div>
+
+    <div class="product-tilt-wrapper">
+      <div class="product" data-tilt data-tilt-max="4" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.12">
+        <span class="badge-limited">كمية محدودة</span>
+        <div class="product-grid">
+          <div class="gallery">
+            <div class="main-shot"><img id="mainShot" src="front.png" alt="كاسك بلوتوث LS2"></div>
+            <div class="thumbs">
+              <img src="front.png" class="active" onclick="swap(this)">
+              <img src="angle2.jpeg" onclick="swap(this)">
+              <img src="angle3.jpeg" onclick="swap(this)">
+              <img src="angle4.jpeg" onclick="swap(this)">
+            </div>
+          </div>
+
+          <div class="details">
+            <div class="eyebrow">LS2 — خوذة كاملة الوجه</div>
+            <h3>كاسك مدمج معه بلوتوث</h3>
+
+            <button type="button" class="specs-toggle" id="specsToggle" onclick="toggleSpecs()">
+              <span>مواصفات الخوذة</span>
+              <svg class="arrow-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="specs-wrap" id="specsWrap">
+              <ul class="specs">
+                <li><span class="ic">📶</span><span class="txt">بلوتوث مدمج مزود بميكروفون خارجي للتواصل أثناء القيادة</span></li>
+                <li><span class="ic">🔊</span><span class="txt">سماعتين مزدوجتين (دوبل) لجودة صوت واضحة حتى بسرعة عالية</span></li>
+                <li><span class="ic">🪖</span><span class="txt">فيزيار (واقي الوجه) يطلع وينزل بسهولة، حماية كاملة من الهواء والغبار</span></li>
+                <li><span class="ic">🔒</span><span class="txt">قفل أمان جانبي + بطانة داخلية مريحة وقابلة للنزع</span></li>
+              </ul>
+            </div>
+
+            <div class="choice-row" style="margin-top:20px;">
+              <div class="choice-block">
+                <span class="choice-label">اللون:</span>
+                <div class="color-row">
+                  <div class="color-opt glossy active" onclick="selectColor(this,'أسود لامع')"><span class="swatch"></span>لامع</div>
+                  <div class="color-opt mat" onclick="selectColor(this,'أسود مطفي')"><span class="swatch"></span>مطفي</div>
+                </div>
+              </div>
+
+              <div class="choice-block">
+                <span class="choice-label">الكمية:</span>
+                <div class="qty-row">
+                  <div class="qty-stepper">
+                    <button type="button" onclick="changeQty(-1)">−</button>
+                    <span id="qtyVal">1</span>
+                    <button type="button" onclick="changeQty(1)">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="price-row" id="priceRow">
+              <div class="price-tag" id="priceTag"><small>دج</small><span id="priceVal">14000</span></div>
+            </div>
+
+            <div class="game-card" id="gameCard">
+              <div class="game-scene">
+                <svg viewBox="0 0 220 130" width="220" height="130">
+                  <defs>
+                    <linearGradient id="carBodyGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#ef4a58"/>
+                      <stop offset="55%" stop-color="#d62839"/>
+                      <stop offset="100%" stop-color="#9c1c28"/>
+                    </linearGradient>
+                    <linearGradient id="carRoofGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#c02532"/>
+                      <stop offset="100%" stop-color="#8f1a24"/>
+                    </linearGradient>
+                    <linearGradient id="glassGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#dff3ff" stop-opacity=".9"/>
+                      <stop offset="100%" stop-color="#8fb9cf" stop-opacity=".65"/>
+                    </linearGradient>
+                    <radialGradient id="rabbitBodyGrad" cx="40%" cy="30%" r="75%">
+                      <stop offset="0%" stop-color="#ffffff"/>
+                      <stop offset="100%" stop-color="#d9d9dc"/>
+                    </radialGradient>
+                  </defs>
+
+                  <ellipse cx="150" cy="112" rx="62" ry="8" fill="#000" opacity=".4"/>
+
+                  <!-- car body -->
+                  <path d="M40 100 L48 72 C52 60 66 52 84 52 L150 52 C166 52 178 60 184 74 L190 100 Z" fill="url(#carBodyGrad)"/>
+                  <path d="M78 56 L96 40 L140 40 L154 56 Z" fill="url(#carRoofGrad)"/>
+                  <!-- windows with center pillar -->
+                  <path d="M98 42 L116 42 L114 55 L98 55 Z" fill="url(#glassGrad)"/>
+                  <rect x="116.5" y="41" width="2.4" height="15" fill="#5a1219"/>
+                  <path d="M120 42 L136 42 L138 55 L122 55 Z" fill="url(#glassGrad)"/>
+                  <!-- door seam + handle -->
+                  <path d="M108 58 L104 98" stroke="#8f1a24" stroke-width="1.2" opacity=".6"/>
+                  <rect x="112" y="76" width="9" height="2.6" rx="1.2" fill="#5a1219" opacity=".8"/>
+                  <!-- bumper -->
+                  <path d="M42 98 L188 98 L186 103 C186 105 184 106 182 106 L48 106 C46 106 44 105 44 103 Z" fill="#2a2c2f"/>
+                  <!-- fender arcs -->
+                  <path d="M52 100 A20 20 0 0 1 88 100" stroke="#7c1720" stroke-width="3" fill="none" opacity=".55"/>
+                  <path d="M150 100 A20 20 0 0 1 186 100" stroke="#7c1720" stroke-width="3" fill="none" opacity=".55"/>
+                  <!-- lights -->
+                  <ellipse cx="185" cy="88" rx="4.5" ry="6" fill="#fff7d6"/>
+                  <ellipse cx="185" cy="88" rx="4.5" ry="6" fill="none" stroke="#c9a94a" stroke-width="1"/>
+                  <rect x="43" y="83" width="5" height="8" rx="1.5" fill="#ffb3ad"/>
+                  <!-- grille -->
+                  <rect x="176" y="95" width="10" height="2" fill="#1c1d1f" opacity=".7"/>
+                  <rect x="176" y="99" width="10" height="2" fill="#1c1d1f" opacity=".7"/>
+
+                  <!-- rear wheel (present) -->
+                  <circle cx="70" cy="100" r="15" fill="#141414"/>
+                  <circle cx="70" cy="100" r="9" fill="#2b2d30"/>
+                  <circle cx="70" cy="100" r="6" fill="#555"/>
+                  <circle cx="70" cy="100" r="2" fill="#222"/>
+                  <!-- front wheel well (missing) -->
+                  <circle cx="168" cy="100" r="15" fill="none" stroke="#3a3d42" stroke-width="2" stroke-dasharray="3 3"/>
+                  <circle cx="168" cy="100" r="4" fill="#3a3d42"/>
+
+                  <!-- rabbit helping -->
+                  <g transform="translate(6,46)">
+                    <ellipse cx="15" cy="10" rx="16" ry="20" fill="#000" opacity=".08"/>
+                    <!-- tail -->
+                    <circle cx="3" cy="46" r="5.5" fill="#eee"/>
+                    <!-- body -->
+                    <ellipse cx="15" cy="48" rx="13" ry="15" fill="url(#rabbitBodyGrad)"/>
+                    <!-- feet -->
+                    <ellipse cx="7" cy="61" rx="5" ry="3" fill="#e4e4e6"/>
+                    <ellipse cx="21" cy="61" rx="5" ry="3" fill="#e4e4e6"/>
+                    <!-- head -->
+                    <circle cx="15" cy="25" r="11.5" fill="url(#rabbitBodyGrad)"/>
+                    <!-- ears -->
+                    <path d="M7 16 C4 4 6 -10 10 -13 C13 -14 14 -10 13 -4 C12 4 11 12 11 16 Z" fill="url(#rabbitBodyGrad)"/>
+                    <path d="M20 16 C23 4 22 -10 18 -13 C15 -14 14 -10 15 -4 C16 4 17 12 17 16 Z" fill="url(#rabbitBodyGrad)"/>
+                    <path d="M8.3 12 C7 3 8.3 -6 10.3 -9 C11.6 -9.6 12 -6.5 11.4 -2 C10.8 3 10 9 10 12 Z" fill="#f3b6c6"/>
+                    <path d="M19.7 12 C21 3 19.7 -6 17.7 -9 C16.4 -9.6 16 -6.5 16.6 -2 C17.2 3 18 9 18 12 Z" fill="#f3b6c6"/>
+                    <!-- face -->
+                    <circle cx="11" cy="24" r="2" fill="#1c1c1e"/>
+                    <circle cx="19" cy="24" r="2" fill="#1c1c1e"/>
+                    <circle cx="11.6" cy="23.3" r=".6" fill="#fff"/>
+                    <circle cx="19.6" cy="23.3" r=".6" fill="#fff"/>
+                    <ellipse cx="15" cy="28" rx="1.8" ry="1.3" fill="#e8a0ab"/>
+                    <path d="M13 30 Q15 32 17 30" stroke="#8a6a6f" stroke-width=".8" fill="none" stroke-linecap="round"/>
+                    <path d="M4 26 L-4 24 M4 28 L-4 29" stroke="#c9c9cc" stroke-width=".6"/>
+                    <path d="M26 26 L34 24 M26 28 L34 29" stroke="#c9c9cc" stroke-width=".6"/>
+                    <!-- arm reaching to the car with a wrench -->
+                    <path d="M25 40 L58 62" stroke="url(#rabbitBodyGrad)" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="58" cy="62" r="4.5" fill="#e4e4e6"/>
+                    <g transform="translate(58,62) rotate(28)">
+                      <rect x="-2" y="-13" width="4" height="14" rx="1.5" fill="#8a9099"/>
+                      <path d="M-4 -13 a4 4 0 1 1 8 0 a4 4 0 0 1 -8 0 M-1 -13 h2" fill="none" stroke="#8a9099" stroke-width="2"/>
+                    </g>
+                  </g>
+
+                  <g id="wheelBtn" style="transform:translate(66px,72px) rotate(-20deg);">
+                    <circle cx="0" cy="0" r="15" fill="#141414" stroke="#8a9099" stroke-width="1.5"/>
+                    <circle cx="0" cy="0" r="9" fill="#2b2d30"/>
+                    <circle cx="0" cy="0" r="6" fill="#555"/>
+                    <circle cx="0" cy="0" r="2" fill="#222"/>
+                  </g>
+                </svg>
+                <div class="bubble" id="bunnyBubble">عاون خوك زوالي😔</div>
+              </div>
+              <div class="game-text">
+                <h4 id="gameTitle">ساعد الأرنب يصلّح السيارة 🐰</h4>
+              </div>
+            </div>
+
+            <button class="order-btn" onclick="openOrderWithFly(event)">اطلب الآن 🚀</button>
+
+            <div class="delivery-note">🏍️ التوصيل متوفر إلى 58 ولاية عبر كامل التراب الوطني</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMING SOON ============ -->
+  <section id="soon">
+    <div class="section-title">
+      <h2>قريباً في ADEM STORE</h2>
+      <p>قطع غيار ومنتجات جديدة في الطريق</p>
+    </div>
+    <div class="soon-grid">
+      <div class="soon-card">
+        <div class="soon-image"><span class="ic">🛞</span><span class="cap">عن قريب</span></div>
+        <div class="soon-body">
+          <h4>عن قريب</h4>
+          <p class="soon-desc">قطع غيار محركات</p>
+          <span class="soon-tag">قريباً</span>
+        </div>
+      </div>
+      <div class="soon-card">
+        <div class="soon-image"><span class="ic">🧤</span><span class="cap">عن قريب</span></div>
+        <div class="soon-body">
+          <h4>عن قريب</h4>
+          <p class="soon-desc">قفازات ولباس الحماية</p>
+          <span class="soon-tag">قريباً</span>
+        </div>
+      </div>
+      <div class="soon-card">
+        <div class="soon-image"><span class="ic">🪖</span><span class="cap">عن قريب</span></div>
+        <div class="soon-body">
+          <h4>عن قريب</h4>
+          <p class="soon-desc">خوذ بموديلات جديدة</p>
+          <span class="soon-tag">قريباً</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="hazard thin" style="margin-bottom:40px;"></div>
+    <div class="farewell">شكراً لزيارتك ADEM STORE 🛵 نتمنى نلقاوك في الطريق!</div>
+    <div class="social">
+      <a href="https://instagram.com/a46.io" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+      </a>
+      <a href="https://www.facebook.com/share/196DN3LQcq/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.25-1.5 1.55-1.5H17V3.7c-.3 0-1.3-.1-2.4-.1-2.4 0-4.1 1.5-4.1 4.2V10H8v3.1h2.5V21h3z"/></svg>
+      </a>
+      <a href="https://wa.me/213671825786" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.1 8.1 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1s-.7.8-.9 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4.1-.1.1-.3 0-.4s-.6-1.4-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.6 1.1 2.8.1.2 1.9 2.9 4.6 4a15.9 15.9 0 0 0 1.6.6c.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+      </a>
+      <a href="https://t.me/+213671825786" target="_blank" rel="noopener" aria-label="Telegram">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 3.5 2.8 11c-.9.4-.9 1.6.1 1.9l4.6 1.5 1.8 5.6c.2.7 1.1.9 1.6.3l2.5-2.7 4.7 3.5c.7.5 1.7.1 1.9-.7l3-16.1c.2-1-.8-1.7-1.7-1.3Zm-4.2 3.4-8 7.2-.3 3.2-1.3-4.3 9.2-6.4c.2-.1.4.1.2.3Z"/></svg>
+      </a>
+    </div>
+    <p class="fine">© 2026 ADEM STORE — جميع الحقوق محفوظة</p>
+  </footer>
+
+</div>
+
+<!-- ============ ORDER MODAL ============ -->
+<div id="overlay">
+  <div class="modal">
+    <button class="close" onclick="closeOrder()">✕</button>
+    <h3>تعبئة معلومات الطلب</h3>
+    <p class="sub" id="orderProduct">المنتج: كاسك مدمج معه بلوتوث - 14000 دج</p>
+    <form id="orderForm" onsubmit="sendOrder(event)">
+      <div class="field">
+        <label>الاسم</label>
+        <input type="text" id="fname" required>
+      </div>
+      <div class="field">
+        <label>اللقب</label>
+        <input type="text" id="lname" required>
+      </div>
+      <div class="field">
+        <label>الولاية</label>
+        <select id="wilaya" required></select>
+      </div>
+      <div class="field">
+        <label>البلدية</label>
+        <input type="text" id="commune" required>
+      </div>
+      <div class="field">
+        <label>رقم الهاتف</label>
+        <input type="tel" id="phone" required placeholder="06XXXXXXXX">
+      </div>
+      <div class="field">
+        <label>طريقة التوصيل</label>
+        <div class="toggle-row">
+          <label><input type="radio" name="delivery" value="توصيل للمكتب" checked><span>توصيل للمكتب</span></label>
+          <label><input type="radio" name="delivery" value="توصيل لباب المنزل"><span>توصيل لباب المنزل</span></label>
+        </div>
+      </div>
+      <button class="submit-btn" type="submit" id="submitBtn">إرسال الطلب</button>
+      <p id="orderStatus" style="text-align:center; font-size:.85rem; margin-top:10px;"></p>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ---------- wilayas ----------
+  const wilayas = ["أدرار","الشلف","الأغواط","أم البواقي","باتنة","بجاية","بسكرة","بشار","البليدة","البويرة",
+  "تمنراست","تبسة","تلمسان","تيارت","تيزي وزو","الجزائر","الجلفة","جيجل","سطيف","سعيدة",
+  "سكيكدة","سيدي بلعباس","عنابة","قالمة","قسنطينة","المدية","مستغانم","المسيلة","معسكر","ورقلة",
+  "وهران","البيض","إليزي","برج بوعريريج","بومرداس","الطارف","تندوف","تيسمسيلت","الوادي","خنشلة",
+  "سوق أهراس","تيبازة","ميلة","عين الدفلى","النعامة","عين تموشنت","غرداية","غليزان","تيميمون","برج باجي مختار",
+  "أولاد جلال","بني عباس","عين صالح","عين قزام","تقرت","جانت","المغير","المنيعة"];
+  const sel = document.getElementById('wilaya');
+  wilayas.forEach((w,i)=>{
+    const o = document.createElement('option');
+    o.value = w; o.textContent = (i+1) + " - " + w;
+    sel.appendChild(o);
+  });
+
+  // ---------- micro-audio synthesis (Web Audio API) ----------
+  let soundEnabled = true;
+  let audioCtx = null;
+  let audioUnlocked = false;
+  function getCtx(){
+    if(!audioCtx){
+      try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; }
+    }
+    if(audioCtx.state === 'suspended'){ audioCtx.resume().catch(()=>{}); }
+    return audioCtx;
+  }
+  function unlockAudio(){
+    if(audioUnlocked) return;
+    const ctx = getCtx();
+    if(!ctx) return;
+    try{
+      const buffer = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buffer;
+      src.connect(ctx.destination);
+      src.start(0);
+    }catch(e){}
+    if(ctx.state === 'suspended'){ ctx.resume().catch(()=>{}); }
+    audioUnlocked = true;
+  }
+  // unlock audio on the very first tap/click/key anywhere (browsers block sound before a gesture)
+  ['pointerdown','touchstart','mousedown','click','keydown'].forEach(evt=>{
+    document.addEventListener(evt, unlockAudio, { once:true, passive:true });
+  });
+
+  function toggleSound(){
+    soundEnabled = !soundEnabled;
+    unlockAudio();
+    const btn = document.getElementById('soundBtn');
+    if(soundEnabled){
+      btn.textContent = '🔊';
+      btn.classList.add('active');
+      playBeep(520, 0.08, 'sine');
+    } else {
+      btn.textContent = '🔇';
+      btn.classList.remove('active');
+    }
+  }
+  // reflect the default "on" state in the button right away (script runs after the button already exists)
+  (function(){
+    const btn = document.getElementById('soundBtn');
+    if(btn){ btn.textContent = '🔊'; btn.classList.add('active'); }
+  })();
+
+  function playBeep(freq, duration, type='sine'){
+    if(!soundEnabled) return;
+    const ctx = getCtx(); if(!ctx) return;
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch(e){}
+  }
+
+  // realistic-ish engine rev: quick pitch sweep up then down + light noise growl
+  function playEngineRev(){
+    if(!soundEnabled) return;
+    const ctx = getCtx(); if(!ctx) return;
+    try{
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(70, now);
+      osc.frequency.linearRampToValueAtTime(240, now + 0.55);
+      osc.frequency.exponentialRampToValueAtTime(90, now + 1.1);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.16, now + 0.4);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 1.15);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now); osc.stop(now + 1.2);
+
+      const bufferSize = ctx.sampleRate * 1.2;
+      const noiseBuf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = noiseBuf.getChannelData(0);
+      for(let i=0;i<bufferSize;i++){ data[i] = (Math.random()*2-1)*0.35; }
+      const noise = ctx.createBufferSource(); noise.buffer = noiseBuf;
+      const noiseFilter = ctx.createBiquadFilter(); noiseFilter.type='bandpass'; noiseFilter.frequency.setValueAtTime(300, now);
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.0001, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.08, now + 0.4);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+      noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(ctx.destination);
+      noise.start(now); noise.stop(now + 1.2);
+    }catch(e){}
+  }
+
+  function playWhoosh(){
+    if(!soundEnabled) return;
+    const ctx = getCtx(); if(!ctx) return;
+    try{
+      const now = ctx.currentTime;
+      const bufferSize = ctx.sampleRate * 0.4;
+      const buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for(let i=0;i<bufferSize;i++){ data[i] = (Math.random()*2-1); }
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const filter = ctx.createBiquadFilter(); filter.type='bandpass';
+      filter.frequency.setValueAtTime(600, now);
+      filter.frequency.exponentialRampToValueAtTime(2500, now + 0.35);
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      src.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+      src.start(now); src.stop(now + 0.4);
+    }catch(e){}
+  }
+
+  function playChime(){
+    if(!soundEnabled) return;
+    [660, 880, 1320].forEach((f,i)=> setTimeout(()=> playBeep(f, 0.35, 'sine'), i*90));
+  }
+
+  // ---------- dynamic ambient glow mouse tracking ----------
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 40;
+    const y = (e.clientY / window.innerHeight - 0.5) * 40;
+    const orb1 = document.getElementById('orb1');
+    const orb2 = document.getElementById('orb2');
+    if(orb1 && orb2){
+      orb1.style.transform = `translate(${x}px, ${y}px)`;
+      orb2.style.transform = `translate(${-x}px, ${-y}px)`;
+    }
+  });
+
+  // ---------- crash intro ----------
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const crash = document.getElementById('crash');
+  const main = document.getElementById('main');
+  const body = document.body;
+
+  function finishIntro(){
+    crash.classList.add('hide');
+    body.classList.remove('locked');
+    main.classList.add('reveal');
+    playWhoosh();
+    initCompanionBike();
+  }
+
+  if(reduced){
+    finishIntro();
+  }else{
+    const bike = document.getElementById('bike');
+    const rays = document.querySelectorAll('.ray');
+    const flash = document.getElementById('flash');
+    const shakeWrap = document.getElementById('shakeWrap');
+    const word = document.getElementById('crashWord');
+
+    setTimeout(()=>{ rays.forEach((r,i)=> setTimeout(()=>r.classList.add('go'), i*50) ); bike.classList.add('ride'); playEngineRev(); }, 200);
+    setTimeout(()=>{
+      flash.classList.add('pop');
+      shakeWrap.classList.add('shaking');
+    }, 1300);
+    setTimeout(()=>{ word.classList.add('show'); playBeep(650, 0.2, 'sine'); }, 1550);
+    setTimeout(()=>{ finishIntro(); }, 3100);
+  }
+  crash.addEventListener('click', finishIntro);
+
+  // ---------- gallery swap ----------
+  function swap(el){
+    document.getElementById('mainShot').src = el.src;
+    document.querySelectorAll('.thumbs img').forEach(i=>i.classList.remove('active'));
+    el.classList.add('active');
+    playBeep(440, 0.05);
+  }
+
+  // ---------- header contact ----------
+  function openContact(e){
+    e.preventDefault();
+    playBeep(600, 0.08);
+    const msg = "سلام عليكم آدم، أود أن أتكلم معك 🙏";
+    window.open("https://wa.me/213671825786?text=" + encodeURIComponent(msg), "_blank");
+  }
+
+  // ---------- specs accordion ----------
+  function toggleSpecs(){
+    document.getElementById('specsToggle').classList.toggle('open');
+    document.getElementById('specsWrap').classList.toggle('open');
+    playBeep(380, 0.06);
+  }
+
+  // ---------- color, quantity, price ----------
+  const basePrice = 14000;
+  let selectedColor = 'أسود لامع';
+  let quantity = 1;
+  let discountApplied = false;
+
+  function selectColor(el, name){
+    document.querySelectorAll('.color-opt').forEach(o=>o.classList.remove('active'));
+    el.classList.add('active');
+    selectedColor = name;
+    playBeep(580, 0.05);
+  }
+
+  function changeQty(delta){
+    quantity = Math.min(10, Math.max(1, quantity + delta));
+    document.getElementById('qtyVal').textContent = quantity;
+    updatePriceDisplay();
+    playBeep(480, 0.05);
+  }
+
+  function totalPrice(){
+    const raw = basePrice * quantity;
+    return discountApplied ? Math.round(raw * 0.98) : raw;
+  }
+
+  function updatePriceDisplay(){
+    const row = document.getElementById('priceRow');
+    const rawTotal = basePrice * quantity;
+    if(discountApplied){
+      row.innerHTML = `
+        <div class="price-old"><small>دج</small> ${rawTotal}</div>
+        <div class="price-tag discounted" id="priceTag"><small>دج</small><span id="priceVal">${totalPrice()}</span></div>`;
+    } else {
+      row.innerHTML = `<div class="price-tag" id="priceTag"><small>دج</small><span id="priceVal">${totalPrice()}</span></div>`;
+    }
+  }
+
+  // ---------- flying add-to-cart animation ----------
+  function openOrderWithFly(e){
+    playBeep(700, 0.1);
+    const btnRect = e.target.getBoundingClientRect();
+    const flyer = document.createElement('div');
+    flyer.textContent = '🪖';
+    Object.assign(flyer.style, {
+      position: 'fixed',
+      left: (btnRect.left + btnRect.width/2) + 'px',
+      top: btnRect.top + 'px',
+      fontSize: '2rem',
+      zIndex: 3000,
+      pointerEvents: 'none',
+      transition: 'all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)'
+    });
+    document.body.appendChild(flyer);
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        flyer.style.left = '40px';
+        flyer.style.top = '20px';
+        flyer.style.transform = 'scale(0.2) rotate(360deg)';
+        flyer.style.opacity = '0';
+      });
+    });
+    setTimeout(()=> flyer.remove(), 650);
+    setTimeout(openOrder, 350);
+  }
+
+  // ---------- discount badge fly ----------
+  function flyDiscountBadge(){
+    const scene = document.querySelector('.game-scene').getBoundingClientRect();
+    const target = document.getElementById('priceRow').getBoundingClientRect();
+    const badge = document.createElement('div');
+    badge.textContent = '-2%';
+    Object.assign(badge.style, {
+      position:'fixed',
+      left:(scene.left + scene.width*0.15) + 'px',
+      top:(scene.top + scene.height*0.35) + 'px',
+      transform:'translate(-50%,-50%) scale(1)',
+      background:'var(--lime)', color:'#141414', fontWeight:'900',
+      padding:'5px 12px', borderRadius:'999px', fontSize:'.85rem',
+      zIndex:2000, pointerEvents:'none',
+      transition:'left .75s ease, top .75s ease, opacity .3s ease .55s, transform .75s ease'
+    });
+    document.body.appendChild(badge);
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        badge.style.left = (target.left + target.width*0.5) + 'px';
+        badge.style.top = (target.top + target.height*0.5) + 'px';
+        badge.style.transform = 'translate(-50%,-50%) scale(.4)';
+        badge.style.opacity = '0';
+      });
+    });
+    setTimeout(()=> badge.remove(), 850);
+  }
+
+  document.getElementById('wheelBtn').addEventListener('click', function(){
+    if(discountApplied) return;
+    this.classList.add('wheel-anim');
+    playBeep(880, 0.15, 'sine');
+    const bubble = document.getElementById('bunnyBubble');
+    const title = document.getElementById('gameTitle');
+    setTimeout(()=>{
+      discountApplied = true;
+      bubble.textContent = 'يودي تحيا غي نتا😙';
+      if(title) title.style.display = 'none';
+      flyDiscountBadge();
+      setTimeout(updatePriceDisplay, 700);
+    }, 620);
+  });
+
+  // ---------- order modal ----------
+  const overlay = document.getElementById('overlay');
+  function openOrder(){
+    playWhoosh();
+    const total = totalPrice();
+    const label = `كاسك مدمج معه بلوتوث — اللون: ${selectedColor} — الكمية: ${quantity} — السعر الإجمالي: ${total} دج${discountApplied ? ' (بعد خصم 2%)' : ''}`;
+    document.getElementById('orderProduct').textContent = "المنتج: " + label;
+    overlay.classList.add('open');
+  }
+  function closeOrder(){ overlay.classList.remove('open'); playBeep(300, 0.05); }
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeOrder(); });
+
+  function sendOrder(e){
+    e.preventDefault();
+    playBeep(750, 0.1);
+    const fname = document.getElementById('fname').value;
+    const lname = document.getElementById('lname').value;
+    const wilaya = document.getElementById('wilaya').value;
+    const commune = document.getElementById('commune').value;
+    const phone = document.getElementById('phone').value;
+    const delivery = document.querySelector('input[name="delivery"]:checked').value;
+    const product = document.getElementById('orderProduct').textContent.replace('المنتج: ','');
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('orderStatus');
+
+    btn.disabled = true; btn.textContent = 'جاري الإرسال...';
+    status.textContent = ''; status.style.color = 'var(--muted)';
+
+    fetch('https://formsubmit.co/ajax/adembenjar@gmail.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        "_subject": "طلب جديد من ADEM STORE 🛵",
+        "المنتج": product,
+        "اللون": selectedColor,
+        "الكمية": quantity,
+        "الاسم": fname,
+        "اللقب": lname,
+        "الولاية": wilaya,
+        "البلدية": commune,
+        "رقم الهاتف": phone,
+        "طريقة التوصيل": delivery
+      })
+    })
+    .then(r => r.json())
+    .then(() => {
+      status.style.color = 'var(--lime)';
+      status.textContent = 'تم إرسال طلبك بنجاح! سنتواصل معك قريباً.';
+      document.getElementById('orderForm').reset();
+      playChime();
+
+      const waMsg = `📦 يوجد طلب جديد في ADEM STORE!
+المنتج: ${product}
+الاسم: ${fname} ${lname}
+الولاية: ${wilaya} - ${commune}
+الهاتف: ${phone}
+التوصيل: ${delivery}`;
+      window.open("https://wa.me/213671825786?text=" + encodeURIComponent(waMsg), "_blank");
+
+      setTimeout(closeOrder, 2200);
+    })
+    .catch(() => {
+      status.style.color = 'var(--red)';
+      status.textContent = 'تعذر إرسال الطلب، حاول مجدداً أو تواصل معنا عبر واتساب.';
+    })
+    .finally(() => {
+      btn.disabled = false; btn.textContent = 'إرسال الطلب';
+    });
+  }
+
+  // ---------- companion bike: follows cursor/finger, wanders when idle ----------
+  function initCompanionBike(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const bike = document.getElementById('companionBike');
+    if(!bike || bike.dataset.inited) return;
+    bike.dataset.inited = '1';
+    bike.classList.add('show');
+
+    const IDLE_TIMEOUT = 4000;
+    const HALF_W = 38, HALF_H = 19;
+    let curX = window.innerWidth/2, curY = window.innerHeight/2;
+    let targetX = curX, targetY = curY;
+    let lastInteract = Date.now();
+    let isIdle = false;
+    let wanderTarget = { x: curX, y: curY };
+    let wanderPauseUntil = 0;
+    let facing = 1; // 1 = facing right, -1 = facing left
+
+    function setPointerTarget(x, y){
+      targetX = x; targetY = y;
+      lastInteract = Date.now();
+      isIdle = false;
+      bike.classList.add('show');
+    }
+    document.addEventListener('pointermove', e => setPointerTarget(e.clientX, e.clientY), { passive:true });
+    document.addEventListener('pointerdown', e => setPointerTarget(e.clientX, e.clientY), { passive:true });
+    document.addEventListener('touchmove', e => {
+      if(e.touches && e.touches[0]) setPointerTarget(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive:true });
+
+    function pickWanderTarget(){
+      const pad = 60;
+      wanderTarget = {
+        x: pad + Math.random() * (window.innerWidth - pad*2),
+        y: pad + Math.random() * (window.innerHeight - pad*2)
+      };
+      wanderPauseUntil = Date.now() + 900 + Math.random()*1800;
+    }
+
+    function tick(){
+      const now = Date.now();
+      let tx, ty, smooth;
+
+      if(now - lastInteract > IDLE_TIMEOUT){
+        if(!isIdle){ isIdle = true; pickWanderTarget(); }
+        const dist = Math.hypot(wanderTarget.x - curX, wanderTarget.y - curY);
+        if(dist < 12 && now > wanderPauseUntil){ pickWanderTarget(); }
+        tx = wanderTarget.x; ty = wanderTarget.y;
+        smooth = 0.025; // slow, relaxed "idling" roam
+      } else {
+        tx = targetX; ty = targetY;
+        smooth = 0.10; // responsive trailing follow
+      }
+
+      const prevX = curX;
+      curX += (tx - curX) * smooth;
+      curY += (ty - curY) * smooth;
+
+      const dx = curX - prevX;
+      if(Math.abs(dx) > 0.15) facing = dx > 0 ? 1 : -1;
+      const lean = Math.max(-12, Math.min(12, dx * 3));
+
+      bike.style.transform =
+        `translate3d(${curX - HALF_W}px, ${curY - HALF_H}px, 0) scaleX(${facing}) rotate(${facing * lean}deg)`;
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+</script>
+</body>
+</html>
