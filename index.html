@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADEM STORE | قطع غيار وخوذ الدراجات النارية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+<style>
+  :root{
+    --bg:#0e0f11;
+    --panel:#17191c;
+    --panel-2:#1e2124;
+    --line:rgba(255,255,255,.08);
+    --steel:#8a9099;
+    --text:#eeeeec;
+    --muted:#9aa0a8;
+    --amber:#f2a93b;
+    --amber-2:#c98420;
+    --red:#d62839;
+    --lime:#8CFF1A;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Cairo',sans-serif;
+    overflow-x:hidden;
+    min-height:100vh;
+    word-wrap:break-word;
+    overflow-wrap:break-word;
+    position:relative;
+  }
+  body.locked{overflow:hidden;height:100vh;}
+  h1,h2,h3,.display{font-family:'Lalezar',sans-serif; font-weight:400; letter-spacing:.5px;}
+
+  /* ===== dynamic ambient glow background ===== */
+  .ambient-glow {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .glow-orb {
+    position: absolute;
+    width: 45vw; height: 45vw;
+    background: radial-gradient(circle, rgba(242,169,59,0.07) 0%, rgba(140,255,26,0.03) 40%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(60px);
+    transition: transform 0.5s ease-out;
+    animation: orbFloat 14s ease-in-out infinite alternate;
+  }
+  .glow-orb.orb-1 { top: -10%; left: -10%; animation-duration: 16s; }
+  .glow-orb.orb-2 { bottom: -10%; right: -10%; background: radial-gradient(circle, rgba(140,255,26,0.05) 0%, rgba(242,169,59,0.04) 50%, transparent 70%); animation-duration: 20s; }
+  @keyframes orbFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(60px, 40px) scale(1.15); }
+  }
+
+  /* ensure content sits above ambient glow */
+  header, .hero, section, footer, #overlay, #crash { position: relative; z-index: 2; }
+
+  /* ===== hazard stripe utility ===== */
+  .hazard{
+    background-image:repeating-linear-gradient(135deg,var(--amber) 0 18px, #111 18px 36px);
+    height:6px;
+  }
+  .hazard.thin{height:3px;}
+
+  /* ===== live social proof ticker ===== */
+  .ticker-wrap {
+    background: rgba(242, 169, 59, 0.08);
+    border-bottom: 1px solid rgba(242, 169, 59, 0.2);
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    padding: 6px 0;
+    font-size: 0.82rem;
+    color: var(--amber);
+    font-weight: 700;
+  }
+  .ticker-content {
+    display: inline-block;
+    animation: tickerMove 30s linear infinite;
+    padding-left: 100%;
+  }
+  .ticker-content span {
+    margin-left: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  @keyframes tickerMove {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+  }
+
+  /* ===== crash intro overlay ===== */
+  #crash{
+    position:fixed; inset:0; z-index:9999;
+    background:radial-gradient(ellipse at center, #16181b 0%, #000 78%);
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  #crash.hide{ display:none; }
+  .vignette{
+    position:absolute; inset:0; pointer-events:none;
+    box-shadow:inset 0 0 18vw 4vw #000;
+  }
+  .ray{
+    position:absolute; top:50%; left:50%; width:1px; height:160vmax;
+    background:linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.06), rgba(255,255,255,0));
+    opacity:0;
+  }
+  .ray.go{ animation: rayGrow 1s ease-out forwards; }
+  @keyframes rayGrow{
+    0%{opacity:0;} 15%{opacity:1;} 100%{opacity:0;}
+  }
+  #bike{
+    position:absolute; top:52%; left:50%;
+    width:220px;
+    transform:translate(-50%,-50%) scale(.05);
+    opacity:0;
+    filter:drop-shadow(0 0 24px rgba(140,255,26,.25));
+  }
+  #bike.ride{ animation: approach 1.15s cubic-bezier(.4,0,.7,.15) forwards; }
+  @keyframes approach{
+    0%{ transform:translate(-50%,-50%) scale(.05); opacity:0; }
+    10%{ opacity:1; }
+    70%{ transform:translate(-50%,-50%) scale(1.3); opacity:1; }
+    100%{ transform:translate(-52%,-48%) scale(3.4); opacity:0; }
+  }
+  #flash{
+    position:absolute; inset:0;
+    background:radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(242,169,59,.85) 35%, rgba(0,0,0,0) 72%);
+    opacity:0; pointer-events:none;
+  }
+  #flash.pop{ animation: flashPop .5s ease-out forwards; }
+  @keyframes flashPop{ 0%{opacity:0;} 10%{opacity:1;} 100%{opacity:0;} }
+  #shakeWrap.shaking{ animation: shake .45s ease-in-out; }
+  @keyframes shake{
+    0%,100%{transform:translate(0,0);}
+    15%{transform:translate(-14px,5px);}
+    35%{transform:translate(11px,-8px);}
+    55%{transform:translate(-8px,8px);}
+    75%{transform:translate(8px,-4px);}
+    90%{transform:translate(-3px,2px);}
+  }
+  #crashWord{
+    position:absolute; opacity:0; text-align:center;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  #crashWord .main-word{
+    font-family:'Lalezar',sans-serif; letter-spacing:1px;
+    font-size:clamp(2.8rem,8vw,5.2rem);
+    background:linear-gradient(180deg,#ffe3ac 0%, var(--amber) 55%, var(--amber-2) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 0 40px rgba(242,169,59,.35);
+  }
+  #crashWord .sub-word{
+    font-family:'Cairo',sans-serif; font-weight:700; letter-spacing:6px;
+    font-size:.85rem; color:#c7c9cc; text-transform:uppercase;
+    opacity:0;
+  }
+  #crashWord.show{ animation: wordPop 1s ease-out forwards; }
+  #crashWord.show .sub-word{ animation: subFade .8s ease-out .5s forwards; }
+  @keyframes wordPop{
+    0%{opacity:0; transform:scale(.75) translateY(6px); filter:blur(6px);}
+    45%{opacity:1; transform:scale(1.05) translateY(0); filter:blur(0);}
+    70%{transform:scale(1);}
+    100%{opacity:1; transform:scale(1);}
+  }
+  @keyframes subFade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ===== main content fade ===== */
+  #main{ opacity:0; }
+  #main.reveal{ animation: fadeUp .8s ease forwards; }
+  @keyframes fadeUp{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ===== header ===== */
+  header{
+    position:sticky; top:0; z-index:500;
+    background:rgba(14,15,17,.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    max-width:1100px; margin:0 auto; padding:8px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo{ font-family:'Lalezar',sans-serif; font-size:1.15rem; letter-spacing:.5px; color:var(--text);}
+  .logo b{color:var(--amber);}
+  .nav-actions{ display:flex; align-items:center; gap:12px; }
+  .nav a.cta{
+    background:var(--amber); color:#141414; font-weight:800;
+    padding:6px 14px; border-radius:6px; text-decoration:none;
+    font-size:.8rem; display:inline-flex; align-items:center; gap:5px;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .nav a.cta svg{ width:13px; height:13px; }
+  .nav a.cta:hover{ transform: translateY(-2px); background: #ffbf5c; }
+
+  /* ===== hero ===== */
+  .hero{
+    max-width:1100px; margin:0 auto; padding:60px 20px 40px;
+    text-align:center;
+  }
+  .hero h1{
+    font-size:clamp(2.6rem,8vw,5rem); color:var(--text);
+  }
+  .hero h1 span{color:var(--amber);}
+  .hero p{
+    color:var(--muted); max-width:560px; margin:18px auto 0;
+    font-size:1.05rem; line-height:1.9;
+  }
+  .scrollcue{
+    margin-top:38px; color:var(--steel); font-size:.85rem;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  .scrollcue .arrow{
+    width:10px;height:10px;border-left:2px solid var(--amber);border-bottom:2px solid var(--amber);
+    transform:rotate(-45deg); animation:bounce 1.6s infinite;
+  }
+  @keyframes bounce{0%,100%{transform:translateY(0) rotate(-45deg);}50%{transform:translateY(6px) rotate(-45deg);}}
+
+  section{max-width:1100px; margin:0 auto; padding:70px 20px;}
+  .section-title{ text-align:center; margin-bottom:36px;}
+  .section-title h2{ font-size:clamp(1.8rem,5vw,2.6rem);}
+  .section-title p{color:var(--muted); margin-top:8px;}
+
+  /* ===== product 3D tilt container ===== */
+  .product-tilt-wrapper {
+    transform-style: preserve-style;
+    transform: perspective(1000px);
+  }
+  .product{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    position:relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    transition: border-color .3s ease, box-shadow .3s ease;
+  }
+  .product:hover {
+    border-color: rgba(242,169,59,0.35);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6), 0 0 30px rgba(242,169,59,0.1);
+  }
+  .product .badge-limited{
+    position:absolute; top:18px; left:18px; z-index:5;
+    background:var(--red); color:#fff; font-weight:800;
+    font-size:.78rem; padding:6px 14px; border-radius:999px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .badge-limited::before{content:"●"; color:#ffcbcb; animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .product-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:0; min-width:0;
+  }
+  @media(max-width:760px){
+    .product-grid{grid-template-columns:1fr;}
+    .gallery{padding:16px !important;}
+    .gallery .main-shot{aspect-ratio:4/3 !important; max-height:260px !important;}
+    .details{padding:20px 18px !important;}
+  }
+  .gallery{ background:#0a0b0c; padding:28px; display:flex; flex-direction:column; gap:14px; min-width:0;}
+  .gallery .main-shot{
+    width:100%; aspect-ratio:1/1; border-radius:10px; overflow:hidden;
+    background:#0a0b0c; position:relative;
+  }
+  .gallery .main-shot img{width:100%;height:100%;object-fit:cover; transition: transform .4s ease;}
+  .gallery .main-shot:hover img{ transform: scale(1.06); }
+  .thumbs{display:flex; gap:10px;}
+  .thumbs img{
+    width:64px;height:64px;object-fit:cover;border-radius:8px;
+    background:#0a0b0c; cursor:pointer; border:2px solid transparent;
+    opacity:.75; transition:.15s;
+  }
+  .thumbs img:hover, .thumbs img.active{opacity:1; border-color:var(--amber);}
+
+  .details{ padding:36px 32px; display:flex; flex-direction:column; min-width:0;}
+  .specs{list-style:none; margin:0; display:flex; flex-direction:column; gap:12px;}
+  .specs li{
+    display:flex; align-items:flex-start; gap:10px; color:#d8dade; font-size:.97rem; line-height:1.6;
+  }
+  .specs li .ic{
+    flex:none; width:22px;height:22px; margin-top:2px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--amber);
+  }
+  .specs li .txt{ flex:1; min-width:0; overflow-wrap:break-word; word-break:break-word;}
+
+  .title-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    margin-top:4px;
+  }
+  .title-row h3{font-size:clamp(1.4rem,4vw,1.8rem); margin:0;}
+  .specs-toggle{
+    width:auto; margin:0; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--muted); font-family:'Cairo'; font-weight:700; font-size:.72rem;
+    padding:5px 10px; border-radius:6px; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; gap:4px;
+    transition:.15s; flex:none;
+  }
+  .specs-toggle:hover{border-color:var(--amber);}
+  .specs-toggle .arrow-ic{ transition:transform .25s ease; flex:none; color:var(--amber);}
+  .specs-toggle.open .arrow-ic{ transform:rotate(180deg); }
+  .specs-wrap{
+    max-height:0; overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .specs-wrap.open{ max-height:400px; }
+  .specs-wrap .specs{ padding-top:18px; }
+  .price-row{
+    display:flex; align-items:center; gap:16px; margin:4px 0 6px; flex-wrap:wrap;
+  }
+  .price-tag{
+    background:var(--amber); color:#141414; font-weight:900;
+    font-size:1.3rem; padding:6px 16px; border-radius:8px;
+    position:relative;
+    font-family:'Lalezar',sans-serif;
+  }
+  .price-tag small{font-size:.8rem; font-weight:700; margin-right:4px;}
+  .delivery-note{
+    display:flex; align-items:center; gap:8px; color:var(--steel);
+    font-size:.88rem; margin:14px 0 22px;
+    border-top:1px dashed var(--line); padding-top:14px;
+  }
+  .order-btn{
+    background:var(--amber); color:#141414; border:none; cursor:pointer;
+    font-family:'Cairo'; font-weight:800; font-size:1.05rem;
+    padding:13px 20px 11px; border-radius:8px;
+    transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+    position: relative; overflow: hidden;
+    display:flex; flex-direction:column; align-items:center; gap:3px; width:100%;
+  }
+  .order-btn .order-btn-sub{
+    font-size:.72rem; font-weight:700; color:#3a2c0c; opacity:.85;
+  }
+  .order-btn:hover{background:#ffbf5c; transform:translateY(-2px); box-shadow: 0 6px 20px rgba(242,169,59,0.3);}
+
+  /* ===== compact quick-select row (price + color + size + qty together) ===== */
+  .quick-row{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:10px 0 16px;
+  }
+  .mini-select{
+    background:#101214; border:1px solid var(--line); color:var(--text);
+    padding:6px 6px; border-radius:7px; font-family:'Cairo',sans-serif;
+    font-size:.72rem; font-weight:700; cursor:pointer; max-width:88px;
+  }
+  .mini-select:focus{ outline:none; border-color:var(--amber); }
+  .qty-stepper.mini{ flex-shrink:0; }
+  .choice-block{ flex-shrink:0; }
+
+  /* ===== color + quantity selectors (legacy, unused but kept for safety) ===== */
+  .choice-row{display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; gap:8px 10px; margin-bottom:6px;}
+  .choice-block{margin-bottom:0; display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .choice-label{font-size:.7rem; color:var(--steel); font-weight:700; white-space:nowrap;}
+  .color-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .color-opt{
+    display:flex; align-items:center; gap:4px; border:1px solid var(--line);
+    background:#101214; padding:4px 8px; border-radius:6px; cursor:pointer;
+    font-size:.72rem; color:var(--muted); transition:.15s;
+  }
+  .color-opt .swatch{
+    width:9px;height:9px;border-radius:50%; border:1px solid rgba(255,255,255,.25);
+  }
+  .color-opt.glossy .swatch{background:#0c0d0e; box-shadow:inset 0 0 0 2px rgba(255,255,255,.15), 0 0 6px rgba(255,255,255,.15);}
+  .color-opt.mat .swatch{background:#26282b;}
+  .color-opt.active{border-color:var(--amber); color:var(--text); background:rgba(242,169,59,.08);}
+  .color-opt.active::after{content:"✓"; color:var(--amber); font-weight:900; margin-right:2px; font-size:.68rem;}
+  .qty-row{display:flex; align-items:center; gap:12px;}
+  .qty-stepper{
+    display:flex; align-items:center; border:1px solid var(--line); border-radius:6px; overflow:hidden;
+  }
+  .qty-stepper button{
+    background:#101214; color:var(--text); border:none; width:22px; height:22px;
+    font-size:.8rem; cursor:pointer; font-family:'Cairo'; font-weight:800;
+    transition: background .15s, color .15s;
+  }
+  .qty-stepper button:hover{background:#191b1e; color:var(--amber);}
+  .qty-stepper span{width:22px; text-align:center; font-weight:800; font-size:.74rem;}
+
+  .price-tag.discounted{background:var(--lime); color: #141414;}
+  .price-old{
+    color:var(--muted); text-decoration:line-through; font-size:1rem; font-weight:700;
+  }
+  .discount-badge{
+    background:var(--red); color:#fff; font-weight:800; font-size:.78rem;
+    padding:5px 12px; border-radius:999px;
+  }
+
+  /* ===== simple product grid (2 per row) ===== */
+  .simple-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media(max-width:620px){ .simple-grid{grid-template-columns:1fr;} }
+  .simple-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    overflow:hidden; position:relative; cursor:pointer;
+    transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .simple-card:hover{ transform: translateY(-4px); border-color: rgba(242,169,59,0.35); box-shadow:0 20px 40px rgba(0,0,0,0.4); }
+  .simple-card .simg{
+    aspect-ratio:1/1; background:#0a0b0c;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .simple-card .simg img{width:100%; height:100%; object-fit:cover; transition:transform .4s ease;}
+  .simple-card:hover .simg img{ transform: scale(1.05); }
+  .simple-card .sbody{padding:16px 18px 20px; text-align:center; border-top:1px solid var(--line);}
+  .simple-card .sname{font-family:'Lalezar',sans-serif; font-size:1.15rem; color:var(--text);}
+  .simple-card .sprice{
+    margin-top:8px; display:inline-flex; align-items:baseline; gap:4px;
+    color:#141414; background:var(--lime); font-family:'Lalezar',sans-serif;
+    font-size:1.15rem; font-weight:400; padding:4px 14px; border-radius:8px;
+  }
+  .simple-card .sprice small{font-size:.72rem; font-weight:700;}
+  .simple-card .badge-limited{top:14px; left:14px; font-size:.7rem; padding:5px 12px;}
+  .simple-card .stap{
+    margin-top:10px; color:var(--steel); font-size:.75rem; display:flex;
+    align-items:center; justify-content:center; gap:5px;
+  }
+
+  /* ===== coming soon (same card language, disabled) ===== */
+  .soon-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media(max-width:620px){ .soon-grid{grid-template-columns:1fr;} }
+  .soon-card{
+    background:var(--panel); border:1px dashed var(--line); border-radius:14px;
+    overflow:hidden; display:flex; flex-direction:column; opacity:.7;
+  }
+  .soon-card .soon-image{
+    aspect-ratio:1/1; background:repeating-linear-gradient(135deg,#1c1e21 0 14px,#141517 14px 28px);
+    display:flex; align-items:center; justify-content:center; position:relative;
+  }
+  .soon-card .soon-image .ic{font-size:2.4rem; opacity:.5;}
+  .soon-card .soon-body{padding:16px 18px 20px; text-align:center; border-top:1px solid var(--line);}
+  .soon-card h4{color:var(--muted); font-weight:700; font-size:1.05rem; font-family:'Lalezar',sans-serif;}
+  .soon-tag{
+    display:inline-block; margin-top:10px; background:rgba(242,169,59,.1);
+    color:var(--amber); font-size:.75rem; font-weight:800;
+    padding:4px 12px; border-radius:999px; border:1px solid rgba(242,169,59,.25);
+  }
+
+  /* ===== product detail modal ===== */
+  #detailOverlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.8);
+    display:none; align-items:center; justify-content:center;
+    z-index:900; padding:16px; backdrop-filter:blur(6px); overflow-y:auto;
+  }
+  #detailOverlay.open{display:flex;}
+  .detail-modal{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:14px;
+    max-width:920px; width:100%; position:relative; margin:auto;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6); max-height:92vh; overflow-y:auto;
+  }
+  .detail-modal .close{
+    position:absolute; top:16px; left:16px; z-index:6; background:rgba(0,0,0,.4);
+    border:none; color:#fff; font-size:1.3rem; cursor:pointer; line-height:1;
+    width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    transition: background .15s;
+  }
+  .detail-modal .close:hover{ background:rgba(0,0,0,.7); }
+  .size-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .size-opt{
+    border:1px solid var(--line); background:#101214; color:var(--muted);
+    padding:5px 12px; border-radius:6px; cursor:pointer; font-size:.78rem;
+    font-weight:700; transition:.15s; font-family:'Cairo';
+  }
+  .size-opt.active{border-color:var(--amber); color:var(--text); background:rgba(242,169,59,.08);}
+  .size-opt.active::after{content:" ✓"; color:var(--amber);}
+  .color-opt.swc .swatch{background:var(--swc-color, #999);}
+
+  /* ===== order modal ===== */
+  #overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.75);
+    display:none; align-items:center; justify-content:center;
+    z-index:800; padding:20px; backdrop-filter:blur(5px);
+  }
+  #overlay.open{display:flex;}
+  .modal{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:14px;
+    max-width:460px; width:100%; padding:28px; max-height:88vh; overflow-y:auto;
+    position:relative; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+  }
+  .modal .close{
+    position:absolute; top:14px; left:14px; background:none; border:none;
+    color:var(--steel); font-size:1.4rem; cursor:pointer; line-height:1;
+    transition: color .15s;
+  }
+  .modal .close:hover{ color: var(--text); }
+  .modal h3{font-size:1.4rem; margin-bottom:4px;}
+  .modal .sub{color:var(--muted); font-size:.86rem; margin-bottom:20px;}
+  .field{margin-bottom:14px; display:flex; flex-direction:column; gap:6px;}
+  .field label{font-size:.85rem; color:var(--steel); font-weight:700;}
+  .field input, .field select{
+    background:#101214; border:1px solid var(--line); color:var(--text);
+    padding:11px 12px; border-radius:8px; font-family:'Cairo'; font-size:.95rem;
+    transition: border-color .15s, outline .15s;
+  }
+  .field input:focus, .field select:focus{outline:2px solid var(--amber); border-color:var(--amber);}
+  .toggle-row{display:flex; gap:10px;}
+  .toggle-row label{
+    flex:1; text-align:center; border:1px solid var(--line); border-radius:8px;
+    padding:11px 6px; font-size:.87rem; cursor:pointer; color:var(--muted);
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .toggle-row input{display:none;}
+  .toggle-row input:checked + span{color:#141414;}
+  .toggle-row label:has(input:checked){background:var(--amber); border-color:var(--amber); color:#141414; font-weight:800;}
+  .delivery-speed-note{
+    margin-top:9px; font-size:.8rem; color:var(--lime); font-weight:700;
+    text-align:center;
+  }
+  .submit-btn{
+    width:100%; margin-top:8px; background:var(--amber); border:none; color:#141414;
+    font-weight:900; font-family:'Cairo'; font-size:1rem; padding:14px; border-radius:8px; cursor:pointer;
+    transition: background .15s, transform .15s;
+  }
+  .submit-btn:hover{background:#ffbf5c; transform: translateY(-1px);}
+
+  /* ===== footer ===== */
+  footer{
+    border-top:1px solid var(--line); padding:50px 20px 34px; text-align:center;
+    margin-top:20px;
+  }
+  .farewell{ color:var(--text); font-size:1.05rem; margin-bottom:22px; font-family:'Lalezar'; letter-spacing:.5px;}
+  .social{display:flex; justify-content:center; gap:16px; margin-bottom:22px;}
+  .social a{
+    width:46px; height:46px; border-radius:50%; border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; color:var(--text);
+    transition:.15s;
+  }
+  .social a:hover{background:var(--amber); color:#141414; border-color:var(--amber); transform:translateY(-3px);}
+  footer .fine{color:var(--muted); font-size:.8rem;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+  }
+</style>
+</head>
+<body class="locked">
+
+<!-- ===== dynamic ambient background glow ===== -->
+<div class="ambient-glow">
+  <div class="glow-orb orb-1" id="orb1"></div>
+  <div class="glow-orb orb-2" id="orb2"></div>
+</div>
+
+<!-- ============ CRASH INTRO ============ -->
+<div id="crash">
+  <div class="vignette"></div>
+  <div id="shakeWrap" style="position:absolute;inset:0;">
+    <div class="ray" style="transform:rotate(-40deg);"></div>
+    <div class="ray" style="transform:rotate(-18deg);"></div>
+    <div class="ray" style="transform:rotate(0deg);"></div>
+    <div class="ray" style="transform:rotate(18deg);"></div>
+    <div class="ray" style="transform:rotate(40deg);"></div>
+
+    <!-- realistic front-view sportbike with rider -->
+    <svg id="bike" viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="80" cy="186" rx="52" ry="9" fill="#000" opacity=".38"/>
+      <ellipse cx="80" cy="168" rx="32" ry="15" fill="#0c0d0e"/>
+      <ellipse cx="80" cy="168" rx="13" ry="6" fill="#3a3d42"/>
+      <ellipse cx="80" cy="168" rx="4" ry="2" fill="#111"/>
+      <path d="M46 168 C46 140 56 116 80 116 C104 116 114 140 114 168 L104 176 C96 182 64 182 56 176 Z" fill="#141414"/>
+      <path d="M54 160 C54 136 64 122 80 122 C96 122 106 136 106 160 L100 170 C92 176 68 176 60 170 Z" fill="#8CFF1A"/>
+      <path d="M66 128 C71 123 89 123 94 128 L92 150 C86 156 74 156 68 150 Z" fill="#141414"/>
+      <path d="M70 108 L90 108 L94 122 L66 122 Z" fill="#cfeeff" opacity=".55"/>
+      <rect x="71" y="134" width="18" height="10" rx="3" fill="#eaffef"/>
+      <circle cx="61" cy="142" r="5" fill="#dff7ff"/>
+      <circle cx="99" cy="142" r="5" fill="#dff7ff"/>
+      <path d="M40 130 L28 122 L28 136 Z" fill="#141414"/>
+      <path d="M120 130 L132 122 L132 136 Z" fill="#141414"/>
+      <path d="M56 118 C58 100 64 88 80 88 C96 88 102 100 104 118 C96 112 64 112 56 118 Z" fill="#101214"/>
+      <path d="M60 116 C68 122 92 122 100 116 L98 128 C90 134 70 134 62 128 Z" fill="#8CFF1A" opacity=".9"/>
+      <path d="M56 118 L34 132 L38 140 L58 126 Z" fill="#101214"/>
+      <path d="M104 118 L126 132 L122 140 L102 126 Z" fill="#101214"/>
+      <ellipse cx="80" cy="66" rx="18" ry="20" fill="#101214"/>
+      <path d="M65 66 C65 56 71 48 80 48 C89 48 95 56 95 66 L92 74 C86 79 74 79 68 74 Z" fill="#1b1e21"/>
+      <path d="M69 66 C69 60 73 66 80 66 C87 66 91 60 91 66 L89 72 C84 76 76 76 71 72 Z" fill="#4b6b78" opacity=".85"/>
+      <path d="M72 50 C76 47 84 47 88 50" stroke="#8CFF1A" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <text x="80" y="163" text-anchor="middle" font-family="Cairo, sans-serif" font-size="8" font-weight="800" fill="#0c0d0e">H2R</text>
+    </svg>
+
+    <div id="flash"></div>
+    <div id="crashWord">
+      <span class="main-word">يا مرحباً 👋</span>
+      <span class="sub-word">ADEM STORE</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MAIN SITE ============ -->
+<div id="main">
+
+  <!-- Live Social Proof Ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker-content" id="tickerContent">
+      <span>🔥 تم طلب كاسك VMS في ولاية الجزائر منذ قليل</span>
+      <span>⚡ توصيل سريع لـ 58 ولاية بأسعار لوزية</span>
+      <span>🚀 الدفع عند الاستلام وضمان الجودة في ADEM STORE</span>
+      <span>🔥 طلب جديد في ولاية وهران - باقٍ القليل من الدفعة الحالية!</span>
+    </div>
+  </div>
+
+  <header>
+    <div class="nav">
+      <div class="logo">ADEM <b>STORE</b></div>
+      <div class="nav-actions">
+        <a class="cta" href="#" onclick="openContact(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px; margin-left:4px;"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.1 8.1 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1s-.7.8-.9 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4.1-.1.1-.3 0-.4s-.6-1.4-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.6 1.1 2.8.1.2 1.9 2.9 4.6 4a15.9 15.9 0 0 0 1.6.6c.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+          تواصل معنا
+        </a>
+      </div>
+    </div>
+    <div class="hazard thin"></div>
+  </header>
+
+  <div class="hero">
+    <h1>جاهز <span>للطريق؟</span> 🏍️</h1>
+    <p>ADEM STORE — متجرك الأول لبيع قطع غيار وخوذ الدراجات النارية بأسعار لوزية وجودة تقدر تعتمد عليها، مع توصيل يوصلك في كل ولايات الوطن.</p>
+    <div class="scrollcue"><span>مرر للأسفل</span><span class="arrow"></span></div>
+  </div>
+
+  <!-- ============ PRODUCTS ============ -->
+  <section id="product">
+    <div class="section-title">
+      <h2>المنتوجات المتوفرة</h2>
+      <p>🏍️ التوصيل متوفر إلى 58 ولاية عبر كامل التراب الوطني — اضغط على المنتج لمعرفة التفاصيل</p>
+    </div>
+
+    <div class="simple-grid" id="productGrid"></div>
+
+    <div class="soon-grid" id="soonGrid" style="margin-top:18px;"></div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer>
+    <div class="hazard thin" style="margin-bottom:40px;"></div>
+    <div class="farewell">شكراً لزيارتك ADEM STORE 🛵 نتمنى نلقاوك في الطريق!</div>
+    <div class="social">
+      <a href="https://instagram.com/a46.io" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
+      </a>
+      <a href="https://www.facebook.com/share/196DN3LQcq/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.25-1.5 1.55-1.5H17V3.7c-.3 0-1.3-.1-2.4-.1-2.4 0-4.1 1.5-4.1 4.2V10H8v3.1h2.5V21h3z"/></svg>
+      </a>
+      <a href="https://wa.me/213671825786" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.1 8.1 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1s-.7.8-.9 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.2 0-.4.1-.5l.4-.4c.1-.1.2-.3.2-.4.1-.1.1-.3 0-.4s-.6-1.4-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.6 1.1 2.8.1.2 1.9 2.9 4.6 4a15.9 15.9 0 0 0 1.6.6c.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>
+      </a>
+      <a href="https://t.me/+213671825786" target="_blank" rel="noopener" aria-label="Telegram">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21.9 3.5 2.8 11c-.9.4-.9 1.6.1 1.9l4.6 1.5 1.8 5.6c.2.7 1.1.9 1.6.3l2.5-2.7 4.7 3.5c.7.5 1.7.1 1.9-.7l3-16.1c.2-1-.8-1.7-1.7-1.3Zm-4.2 3.4-8 7.2-.3 3.2-1.3-4.3 9.2-6.4c.2-.1.4.1.2.3Z"/></svg>
+      </a>
+    </div>
+    <p class="fine">© 2026 ADEM STORE — جميع الحقوق محفوظة</p>
+  </footer>
+
+</div>
+
+<!-- ============ PRODUCT DETAIL MODAL ============ -->
+<div id="detailOverlay">
+  <div class="detail-modal product-tilt-wrapper">
+    <button class="close" onclick="closeDetail()">✕</button>
+    <div class="product" style="box-shadow:none; border:none;" id="detailProduct">
+      <span class="badge-limited" id="detailBadge" style="display:none;"></span>
+      <div class="product-grid">
+        <div class="gallery">
+          <div class="main-shot"><img id="dMainShot" src="" alt=""></div>
+          <div class="thumbs" id="dThumbs"></div>
+          <div class="title-row">
+            <h3 id="dTitle"></h3>
+            <button type="button" class="specs-toggle" id="dSpecsToggle" onclick="toggleDetailSpecs()">
+              <span>المواصفات</span>
+              <svg class="arrow-ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="details">
+          <div class="price-row" id="dPriceRow">
+            <div class="price-tag discounted"><small>دج</small><span id="dPriceVal">0</span></div>
+          </div>
+
+          <div class="choice-row" style="margin-top:12px;">
+            <div class="choice-block">
+              <span class="choice-label">اللون:</span>
+              <select class="mini-select" id="dColorSelect" onchange="applyColor(this.selectedIndex)"></select>
+            </div>
+
+            <div class="choice-block">
+              <span class="choice-label">المقاس:</span>
+              <select class="mini-select" id="dSizeSelect" onchange="selectSize(this.value)"></select>
+            </div>
+
+            <div class="choice-block">
+              <span class="choice-label">الكمية:</span>
+              <div class="qty-stepper mini">
+                <button type="button" onclick="changeDetailQty(-1)">−</button>
+                <span id="dQtyVal">1</span>
+                <button type="button" onclick="changeDetailQty(1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="specs-wrap" id="dSpecsWrap" style="margin-top:4px;">
+            <ul class="specs" id="dSpecsList"></ul>
+          </div>
+
+          <button class="order-btn" onclick="openOrderFromDetail()" style="margin-top:6px;">
+            اطلب الآن 🚀
+            <span class="order-btn-sub">💵 الدفع عند الاستلام</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ORDER MODAL ============ -->
+<div id="overlay">
+  <div class="modal">
+    <button class="close" onclick="closeOrder()">✕</button>
+    <h3>تعبئة معلومات الطلب</h3>
+    <p class="sub" id="orderProduct">المنتج: كاسك VMS - 6500 دج</p>
+    <form id="orderForm" onsubmit="sendOrder(event)">
+      <div class="field">
+        <label>الاسم</label>
+        <input type="text" id="fname" required>
+      </div>
+      <div class="field">
+        <label>اللقب</label>
+        <input type="text" id="lname" required>
+      </div>
+      <div class="field">
+        <label>الولاية</label>
+        <select id="wilaya" required></select>
+      </div>
+      <div class="field">
+        <label>البلدية</label>
+        <input type="text" id="commune" required>
+      </div>
+      <div class="field">
+        <label>رقم الهاتف</label>
+        <input type="tel" id="phone" required placeholder="06XXXXXXXX">
+      </div>
+      <div class="field">
+        <label>طريقة التوصيل</label>
+        <div class="toggle-row">
+          <label><input type="radio" name="delivery" value="توصيل للمكتب" checked><span>توصيل للمكتب</span></label>
+          <label><input type="radio" name="delivery" value="توصيل لباب المنزل"><span>توصيل لباب المنزل</span></label>
+        </div>
+        <p class="delivery-speed-note">🚀 توصيل سريع، يوم أو يومين وتوصلك حاجتك</p>
+      </div>
+      <button class="submit-btn" type="submit" id="submitBtn">إرسال الطلب</button>
+      <p id="orderStatus" style="text-align:center; font-size:.85rem; margin-top:10px;"></p>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ---------- wilayas ----------
+  const wilayas = ["أدرار","الشلف","الأغواط","أم البواقي","باتنة","بجاية","بسكرة","بشار","البليدة","البويرة",
+  "تمنراست","تبسة","تلمسان","تيارت","تيزي وزو","الجزائر","الجلفة","جيجل","سطيف","سعيدة",
+  "سكيكدة","سيدي بلعباس","عنابة","قالمة","قسنطينة","المدية","مستغانم","المسيلة","معسكر","ورقلة",
+  "وهران","البيض","إليزي","برج بوعريريج","بومرداس","الطارف","تندوف","تيسمسيلت","الوادي","خنشلة",
+  "سوق أهراس","تيبازة","ميلة","عين الدفلى","النعامة","عين تموشنت","غرداية","غليزان","تيميمون","برج باجي مختار",
+  "أولاد جلال","بني عباس","عين صالح","عين قزام","تقرت","جانت","المغير","المنيعة"];
+  const sel = document.getElementById('wilaya');
+  wilayas.forEach((w,i)=>{
+    const o = document.createElement('option');
+    o.value = w; o.textContent = (i+1) + " - " + w;
+    sel.appendChild(o);
+  });
+
+  // ---------- dynamic ambient glow mouse tracking ----------
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 40;
+    const y = (e.clientY / window.innerHeight - 0.5) * 40;
+    const orb1 = document.getElementById('orb1');
+    const orb2 = document.getElementById('orb2');
+    if(orb1 && orb2){
+      orb1.style.transform = `translate(${x}px, ${y}px)`;
+      orb2.style.transform = `translate(${-x}px, ${-y}px)`;
+    }
+  });
+
+  // ---------- crash intro ----------
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const crash = document.getElementById('crash');
+  const main = document.getElementById('main');
+  const body = document.body;
+
+  function finishIntro(){
+    crash.classList.add('hide');
+    body.classList.remove('locked');
+    main.classList.add('reveal');
+  }
+
+  if(reduced){
+    finishIntro();
+  }else{
+    const bike = document.getElementById('bike');
+    const rays = document.querySelectorAll('.ray');
+    const flash = document.getElementById('flash');
+    const shakeWrap = document.getElementById('shakeWrap');
+    const word = document.getElementById('crashWord');
+
+    setTimeout(()=>{ rays.forEach((r,i)=> setTimeout(()=>r.classList.add('go'), i*50) ); bike.classList.add('ride'); }, 200);
+    setTimeout(()=>{
+      flash.classList.add('pop');
+      shakeWrap.classList.add('shaking');
+    }, 1300);
+    setTimeout(()=>{ word.classList.add('show'); }, 1550);
+    setTimeout(()=>{ finishIntro(); }, 3100);
+  }
+  crash.addEventListener('click', finishIntro);
+
+  // ---------- header contact ----------
+  function openContact(e){
+    e.preventDefault();
+    const msg = "سلام عليكم آدم، أود أن أتكلم معك 🙏";
+    window.open("https://wa.me/213671825786?text=" + encodeURIComponent(msg), "_blank");
+  }
+
+  // ================= PRODUCTS DATA =================
+  const PRODUCTS = [
+    {
+      id:'p1',
+      name:'كاسك VMS دوبل فيزيار',
+      badge:'كمية محدودة',
+      price:6500,
+      cover:'p1-front.jpg',
+      specs:[
+        {ic:'🪖', txt:'دوبل فيزيار: فيزيار خارجي شفاف + فيزيار شمسي داخلي للحماية من الشمس والغبار'},
+        {ic:'⬆️', txt:'فيزيار داخلي يطلع وينزل بسهولة وبضغطة واحدة'},
+        {ic:'🛡️', txt:'كاسك يجمعلك بين الحماية والراحة في كل مشاويرك'},
+        {ic:'🔒', txt:'قفل أمان جانبي + بطانة داخلية مريحة وقابلة للنزع'}
+      ],
+      colors:[
+        {key:'glossy', label:'أسود لامع', cls:'glossy', images:['p1-front.jpg','p1-back.jpg','p1-side.jpg'], sizes:['M','XL']},
+        {key:'mat', label:'أسود مطفي', cls:'mat', images:['p1-mat-side.jpg','p1-mat-back.jpg'], sizes:['L']}
+      ]
+    },
+    {
+      id:'p2',
+      name:'كاسك VMS',
+      badge:null,
+      price:3500,
+      cover:'p2-red-front.jpg',
+      specs:[
+        {ic:'🪖', txt:'كاسك نصفي مفتوح بفيزيار شفاف واسع لرؤية أوضح'},
+        {ic:'🎨', txt:'تصميم رياضي بألوان عاكسة تزيد من وضوحك في الطريق'},
+        {ic:'🧵', txt:'بطانة داخلية مريحة وقابلة للنزع والغسل'},
+        {ic:'⚙️', txt:'هيكل خارجي خفيف الوزن ومتين لاستعمال يومي'}
+      ],
+      colors:[
+        {key:'red', label:'أحمر', cls:'swc', color:'#d62839', images:['p2-red-front.jpg','p2-red-back.jpg'], sizes:['XL']},
+        {key:'yellow', label:'أصفر فسفوري', cls:'swc', color:'#d6e600', images:['p2-yellow-front.jpg','p2-yellow-back.jpg'], sizes:['XL']}
+      ]
+    }
+  ];
+
+  const SOON_ITEMS = [
+    {ic:'🧤', title:'قفازات ولباس الحماية'},
+    {ic:'🛞', title:'قطع غيار ومستلزمات إضافية'}
+  ];
+
+  // ---------- render product cards ----------
+  const productGrid = document.getElementById('productGrid');
+  PRODUCTS.forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'simple-card';
+    card.onclick = ()=>openDetail(p.id);
+    card.innerHTML = `
+      ${p.badge ? `<span class="badge-limited">${p.badge}</span>` : ''}
+      <div class="simg"><img src="${p.cover}" alt="${p.name}"></div>
+      <div class="sbody">
+        <div class="sname">${p.name}</div>
+        <div class="sprice"><small>دج</small>${p.price}</div>
+        <div class="stap">👆 اضغط لعرض التفاصيل</div>
+      </div>`;
+    productGrid.appendChild(card);
+  });
+
+  const soonGrid = document.getElementById('soonGrid');
+  SOON_ITEMS.forEach(s=>{
+    const card = document.createElement('div');
+    card.className = 'soon-card';
+    card.innerHTML = `
+      <div class="soon-image"><span class="ic">${s.ic}</span></div>
+      <div class="soon-body">
+        <h4>${s.title}</h4>
+        <span class="soon-tag">قريباً</span>
+      </div>`;
+    soonGrid.appendChild(card);
+  });
+
+  // ---------- product detail modal ----------
+  const detailOverlay = document.getElementById('detailOverlay');
+  let currentProduct = null;
+  let currentColorIdx = 0;
+  let currentSize = null;
+  let detailQty = 1;
+
+  function openDetail(id){
+    currentProduct = PRODUCTS.find(p=>p.id===id);
+    currentColorIdx = 0;
+    detailQty = 1;
+    document.getElementById('dQtyVal').textContent = 1;
+
+    document.getElementById('dTitle').textContent = currentProduct.name;
+    updateDetailPrice();
+
+    const badgeEl = document.getElementById('detailBadge');
+    if(currentProduct.badge){ badgeEl.style.display='flex'; badgeEl.textContent = currentProduct.badge; }
+    else{ badgeEl.style.display='none'; }
+
+    const specsList = document.getElementById('dSpecsList');
+    specsList.innerHTML = currentProduct.specs.map(s=>`<li><span class="ic">${s.ic}</span><span class="txt">${s.txt}</span></li>`).join('');
+    document.getElementById('dSpecsToggle').classList.remove('open');
+    document.getElementById('dSpecsWrap').classList.remove('open');
+
+    renderColorSelect();
+    applyColor(0);
+
+    detailOverlay.classList.add('open');
+  }
+
+  function closeDetail(){ detailOverlay.classList.remove('open'); }
+  detailOverlay.addEventListener('click', (e)=>{ if(e.target === detailOverlay) closeDetail(); });
+
+  function renderColorSelect(){
+    const sel = document.getElementById('dColorSelect');
+    sel.innerHTML = currentProduct.colors.map(c=>`<option value="${c.key}">${c.label}</option>`).join('');
+    sel.selectedIndex = 0;
+  }
+
+  function applyColor(idx){
+    currentColorIdx = idx;
+    const color = currentProduct.colors[idx];
+    document.getElementById('dColorSelect').selectedIndex = idx;
+
+    document.getElementById('dMainShot').src = color.images[0];
+    const thumbs = document.getElementById('dThumbs');
+    thumbs.innerHTML = color.images.map((img,i)=>`<img src="${img}" class="${i===0?'active':''}" onclick="swapDetail(this)">`).join('');
+
+    const sizeSel = document.getElementById('dSizeSelect');
+    sizeSel.innerHTML = color.sizes.map(s=>`<option value="${s}">${s}</option>`).join('');
+    sizeSel.selectedIndex = 0;
+    currentSize = color.sizes[0];
+  }
+
+  function swapDetail(el){
+    document.getElementById('dMainShot').src = el.src;
+    document.querySelectorAll('#dThumbs img').forEach(i=>i.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function selectSize(size){
+    currentSize = size;
+  }
+
+  function toggleDetailSpecs(){
+    document.getElementById('dSpecsToggle').classList.toggle('open');
+    document.getElementById('dSpecsWrap').classList.toggle('open');
+  }
+
+  function changeDetailQty(delta){
+    detailQty = Math.min(10, Math.max(1, detailQty + delta));
+    document.getElementById('dQtyVal').textContent = detailQty;
+    updateDetailPrice();
+  }
+
+  function updateDetailPrice(){
+    document.getElementById('dPriceVal').textContent = currentProduct.price * detailQty;
+  }
+
+  // ---------- order modal ----------
+  const overlay = document.getElementById('overlay');
+  function openOrderFromDetail(){
+    const color = currentProduct.colors[currentColorIdx];
+    const total = currentProduct.price * detailQty;
+    const label = `${currentProduct.name} — اللون: ${color.label} — المقاس: ${currentSize} — الكمية: ${detailQty} — السعر الإجمالي: ${total} دج`;
+    document.getElementById('orderProduct').textContent = "المنتج: " + label;
+    closeDetail();
+    overlay.classList.add('open');
+  }
+  function closeOrder(){ overlay.classList.remove('open'); }
+  overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeOrder(); });
+
+  function sendOrder(e){
+    e.preventDefault();
+    const fname = document.getElementById('fname').value;
+    const lname = document.getElementById('lname').value;
+    const wilaya = document.getElementById('wilaya').value;
+    const commune = document.getElementById('commune').value;
+    const phone = document.getElementById('phone').value;
+    const delivery = document.querySelector('input[name="delivery"]:checked').value;
+    const product = document.getElementById('orderProduct').textContent.replace('المنتج: ','');
+    const btn = document.getElementById('submitBtn');
+    const status = document.getElementById('orderStatus');
+
+    btn.disabled = true; btn.textContent = 'جاري الإرسال...';
+    status.textContent = ''; status.style.color = 'var(--muted)';
+
+    const TG_BOT_TOKEN = '8734213966:AAEyflPyLxvBpdaxC71ybDMQjd0_Gq064hI';
+    const TG_CHAT_ID = '8155206203';
+
+    const tgMsg = `📦 طلب جديد من ADEM STORE 🛵
+━━━━━━━━━━━━━━━
+🛒 المنتج: ${product}
+👤 الاسم: ${fname} ${lname}
+📍 الولاية: ${wilaya} - ${commune}
+📞 الهاتف: ${phone}
+🚚 التوصيل: ${delivery}`;
+
+    fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TG_CHAT_ID,
+        text: tgMsg
+      })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (!data.ok) throw new Error('Telegram error');
+      status.style.color = 'var(--lime)';
+      status.textContent = 'تم إرسال طلبك بنجاح! سنتواصل معك قريباً.';
+      document.getElementById('orderForm').reset();
+      setTimeout(closeOrder, 2200);
+    })
+    .catch(() => {
+      status.style.color = 'var(--red)';
+      status.textContent = 'تعذر إرسال الطلب، حاول مجدداً أو تواصل معنا عبر واتساب.';
+    })
+    .finally(() => {
+      btn.disabled = false; btn.textContent = 'إرسال الطلب';
+    });
+  }
+
+</script>
+</body>
+</html>
