@@ -402,6 +402,13 @@
     transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
   }
   .simple-card:hover{ transform: translateY(-4px); border-color: rgba(242,169,59,0.35); box-shadow:0 20px 40px rgba(0,0,0,0.4); }
+  .simple-card.reveal-init{ opacity:0; transform: translateY(60px); }
+  .simple-card.reveal-in{ animation: cardRiseUp .7s cubic-bezier(.2,.7,.3,1) forwards; }
+  @keyframes cardRiseUp{
+    0%{ opacity:0; transform: translateY(60px) scale(.96); }
+    60%{ opacity:1; }
+    100%{ opacity:1; transform: translateY(0) scale(1); }
+  }
   .simple-card .simg{
     aspect-ratio:1/1; background:#0a0b0c;
     display:flex; align-items:center; justify-content:center; overflow:hidden;
@@ -631,8 +638,6 @@
     </div>
 
     <div class="simple-grid" id="productGrid"></div>
-
-    <div class="soon-grid" id="soonGrid" style="margin-top:18px;"></div>
   </section>
 
   <!-- ============ FOOTER ============ -->
@@ -640,7 +645,7 @@
     <div class="hazard thin" style="margin-bottom:40px;"></div>
     <div class="farewell">شكراً لزيارتك ADEM STORE 🛵 نتمنى نلقاوك في الطريق!</div>
     <div class="social">
-      <a href="https://instagram.com/a46.io" target="_blank" rel="noopener" aria-label="Instagram">
+      <a href="https://www.instagram.com/adem_moto46?igsh=MXJ1ZzJwa2t0eXM3bg%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg>
       </a>
       <a href="https://www.facebook.com/share/196DN3LQcq/?mibextid=wwXIfr" target="_blank" rel="noopener" aria-label="Facebook">
@@ -819,7 +824,7 @@
   // ---------- header contact ----------
   function openContact(e){
     e.preventDefault();
-    const msg = "سلام عليكم آدم، أود أن أتكلم معك 🙏";
+    const msg = "سلام عليكم لدي بعض تساؤلات";
     window.open("https://wa.me/213671825786?text=" + encodeURIComponent(msg), "_blank");
   }
 
@@ -843,16 +848,34 @@
       ]
     },
     {
-      id:'p2',
-      name:'كاسك VMS',
+      id:'p3',
+      name:'كاسك VMS بو خفيف فزيارة فيمي',
       badge:null,
-      price:3500,
+      price:4500,
+      cover:'p3-front.jpg',
+      specs:[
+        {ic:'🪖', txt:'كاسك نصفي مفتوح (جيت) بفيزيار فيمي (مدخن) يمنحك خصوصية أكبر أثناء القيادة'},
+        {ic:'🎨', txt:'تصميم رياضي أنيق بخطوط عاكسة يبرز إطلالتك في الطريق ليلاً ونهاراً'},
+        {ic:'🧵', txt:'بطانة داخلية مريحة وقابلة للنزع والغسل'},
+        {ic:'⚙️', txt:'هيكل خارجي خفيف الوزن جداً ومتين لراحة أكبر في الاستعمال اليومي'},
+        {ic:'🔒', txt:'قفل أمان جانبي ثابت لضمان تثبيت الفيزيار أثناء القيادة'}
+      ],
+      colors:[
+        {key:'red', label:'أحمر', cls:'swc', color:'#d62839', images:['p3-front.jpg','p3-back.jpg','p3-side1.jpg','p3-side2.jpg'], sizes:['XL']},
+        {key:'green', label:'أخضر', cls:'swc', color:'#2e7d32', images:['p3-front.jpg','p3-back.jpg','p3-side1.jpg','p3-side2.jpg'], sizes:['XL']}
+      ]
+    },
+    {
+      id:'p2',
+      name:'كاسك VMS بو خفيف',
+      badge:null,
+      price:4000,
       cover:'p2-red-front.jpg',
       specs:[
-        {ic:'🪖', txt:'كاسك نصفي مفتوح بفيزيار شفاف واسع لرؤية أوضح'},
-        {ic:'🎨', txt:'تصميم رياضي بألوان عاكسة تزيد من وضوحك في الطريق'},
+        {ic:'🪖', txt:'فيزيار شفاف بالكامل يمنحك رؤية واضحة وسهلة في كل الظروف'},
+        {ic:'🎨', txt:'تصميم رياضي أنيق بألوان عاكسة تبرز حضورك في الطريق'},
         {ic:'🧵', txt:'بطانة داخلية مريحة وقابلة للنزع والغسل'},
-        {ic:'⚙️', txt:'هيكل خارجي خفيف الوزن ومتين لاستعمال يومي'}
+        {ic:'⚙️', txt:'هيكل خارجي خفيف الوزن جداً ومتين، مثالي للاستعمال اليومي'}
       ],
       colors:[
         {key:'red', label:'أحمر', cls:'swc', color:'#d62839', images:['p2-red-front.jpg','p2-red-back.jpg'], sizes:['XL']},
@@ -862,6 +885,7 @@
   ];
 
   const SOON_ITEMS = [
+    {ic:'🪖', title:'كاسك VMS جديد'},
     {ic:'🧤', title:'قفازات ولباس الحماية'},
     {ic:'🛞', title:'قطع غيار ومستلزمات إضافية'}
   ];
@@ -870,7 +894,7 @@
   const productGrid = document.getElementById('productGrid');
   PRODUCTS.forEach(p=>{
     const card = document.createElement('div');
-    card.className = 'simple-card';
+    card.className = 'simple-card reveal-init';
     card.onclick = ()=>openDetail(p.id);
     card.innerHTML = `
       ${p.badge ? `<span class="badge-limited">${p.badge}</span>` : ''}
@@ -883,7 +907,6 @@
     productGrid.appendChild(card);
   });
 
-  const soonGrid = document.getElementById('soonGrid');
   SOON_ITEMS.forEach(s=>{
     const card = document.createElement('div');
     card.className = 'soon-card';
@@ -893,8 +916,20 @@
         <h4>${s.title}</h4>
         <span class="soon-tag">قريباً</span>
       </div>`;
-    soonGrid.appendChild(card);
+    productGrid.appendChild(card);
   });
+
+  // ---------- scroll reveal animation for product cards ----------
+  const revealObserver = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('reveal-in');
+        entry.target.classList.remove('reveal-init');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.simple-card.reveal-init').forEach(card=> revealObserver.observe(card));
 
   // ---------- product detail modal ----------
   const detailOverlay = document.getElementById('detailOverlay');
